@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pingbox - Free Email Validation Tool</title>
+  <meta name="description" content="Validate email addresses instantly. Real MX + SMTP verification. Free, no signup needed." />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+    /* ── DARK THEME (default) ── */
+    :root,[data-theme="dark"]{
+      --bg:#08090A;
+      --bg-mid:#111318;
+      --bg-card:#16191F;
+      --bg-input:#111318;
+      --border:#1F2430;
+      --border-light:#2A3040;
+      --text:#FFFFFF;
+      --text-body:#CBD5E1;
+      --text-muted:#6B7A99;
+      --text-muted2:#8896B3;
+      --nav-bg:rgba(8,9,10,0.92);
+      --hero-glow:rgba(37,99,235,0.18);
+      --card-shadow:0 24px 64px rgba(0,0,0,0.5);
+      --ad-grid:var(--border);
+      --table-head:rgba(0,0,0,0.3);
+      --check-pill:rgba(0,0,0,0.2);
+      --mx-block:rgba(0,0,0,0.2);
+      --toggle-bg:#1F2430;
+      --toggle-icon:☀️;
+    }
+
+    /* ── LIGHT THEME ── */
+    [data-theme="light"]{
+      --bg:#F8FAFC;
+      --bg-mid:#FFFFFF;
+      --bg-card:#FFFFFF;
+      --bg-input:#F1F5F9;
+      --border:#E2E8F0;
+      --border-light:#CBD5E1;
+      --text:#0F172A;
+      --text-body:#334155;
+      --text-muted:#64748B;
+      --text-muted2:#475569;
+      --nav-bg:rgba(248,250,252,0.92);
+      --hero-glow:rgba(37,99,235,0.08);
+      --card-shadow:0 4px 32px rgba(15,23,42,0.1);
+      --ad-grid:#CBD5E1;
+      --table-head:#F8FAFC;
+      --check-pill:#F1F5F9;
+      --mx-block:#F1F5F9;
+      --toggle-bg:#E2E8F0;
+      --toggle-icon:🌙;
+    }
+
+    /* ── FIXED COLORS (same in both themes) ── */
+    :root{
+      --blue:#2563EB;--blue-bright:#3B82F6;--blue-glow:rgba(37,99,235,0.15);--blue-soft:rgba(59,130,246,0.08);
+      --green:#16A34A;--green-bg:rgba(22,163,74,0.08);--green-border:rgba(22,163,74,0.25);
+      --red:#DC2626;--red-bg:rgba(220,38,38,0.08);--red-border:rgba(220,38,38,0.25);
+      --yellow:#D97706;--yellow-bg:rgba(217,119,6,0.08);--yellow-border:rgba(217,119,6,0.25);
+    }
+
+    html{scroll-behavior:smooth}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;transition:background 0.25s,color 0.25s}
+
+    /* ── NAV ── */
+    nav{position:sticky;top:0;z-index:100;background:var(--nav-bg);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:58px}
+    .logo{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.15rem;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:0.5rem;letter-spacing:-0.02em}
+    .logo-icon{width:30px;height:30px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;position:relative}
+    .logo-icon::after{content:'';position:absolute;inset:-3px;border-radius:11px;border:1.5px solid var(--blue);opacity:0;animation:logopulse 2.5s ease-in-out infinite}
+    @keyframes logopulse{0%,100%{opacity:0;transform:scale(1)}50%{opacity:0.45;transform:scale(1.15)}}
+    .nav-links{display:flex;gap:1.75rem;list-style:none}
+    .nav-links a{color:var(--text-muted);text-decoration:none;font-size:0.85rem;font-weight:500;transition:color 0.2s;white-space:nowrap}
+    .nav-links a:hover{color:var(--text)}
+    .nav-right{display:flex;align-items:center;gap:0.75rem}
+    .nav-status{display:flex;align-items:center;gap:0.4rem;font-size:0.72rem;color:var(--text-muted);background:var(--bg-card);border:1px solid var(--border);padding:0.28rem 0.7rem;border-radius:99px}
+    .status-dot{width:6px;height:6px;border-radius:50%;background:var(--text-muted);transition:background 0.3s}
+    .status-dot.online{background:var(--green);box-shadow:0 0 6px var(--green)}
+    .status-dot.offline{background:var(--red)}
+    .status-dot.demo{background:var(--blue-bright);box-shadow:0 0 6px var(--blue-bright)}
+
+    /* ── THEME TOGGLE ── */
+    .theme-toggle{width:36px;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--toggle-bg);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all 0.2s;flex-shrink:0}
+    .theme-toggle:hover{border-color:var(--blue)}
+
+    /* ── AD BANNER (top) ── */
+    .ad-banner{background:var(--bg-mid);border-bottom:1px solid var(--border);padding:0.6rem 2rem;display:flex;align-items:center;justify-content:center;gap:1rem;min-height:60px}
+    .ad-label{font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;border:1px solid var(--border);padding:0.15rem 0.4rem;border-radius:4px;white-space:nowrap}
+    .ad-placeholder{flex:1;max-width:728px;height:40px;background:repeating-linear-gradient(90deg,var(--ad-grid) 0,var(--ad-grid) 1px,transparent 1px,transparent 20px),repeating-linear-gradient(0deg,var(--ad-grid) 0,var(--ad-grid) 1px,transparent 1px,transparent 20px);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:0.75rem}
+
+    /* ── OFFLINE BANNER ── */
+    .offline-banner{background:var(--yellow-bg);border-bottom:1px solid var(--yellow-border);padding:0.55rem 1.5rem;text-align:center;font-size:0.8rem;color:var(--yellow);display:none}
+    .offline-banner.show{display:block}
+    .offline-banner.info{background:var(--blue-soft);border-bottom:1px solid rgba(59,130,246,0.25);color:var(--blue-bright)}
+    .offline-banner a{color:inherit;text-decoration:underline;font-weight:600}
+
+    /* ── HERO ── */
+    .hero{padding:5.5rem 2rem 4rem;text-align:center;position:relative;overflow:hidden}
+    .hero::before{content:'';position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:700px;height:350px;background:radial-gradient(ellipse,var(--hero-glow) 0%,transparent 70%);pointer-events:none}
+    .hero-eyebrow{display:inline-flex;align-items:center;gap:0.4rem;background:var(--blue-soft);border:1px solid rgba(59,130,246,0.2);color:var(--blue-bright);font-size:0.72rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:0.3rem 0.85rem;border-radius:99px;margin-bottom:1.5rem}
+    .hero h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(2.4rem,5.5vw,4rem);font-weight:800;line-height:1.06;letter-spacing:-0.035em;color:var(--text);margin-bottom:1.25rem}
+    .hero h1 .blue{color:var(--blue-bright)}
+    .hero-sub{color:var(--text-muted2);font-size:1.05rem;max-width:500px;margin:0 auto 2rem;line-height:1.65}
+    .hero-stats{display:flex;align-items:center;justify-content:center;gap:2.5rem;flex-wrap:wrap;margin-top:0.5rem}
+    .hero-stat{text-align:center}
+    .hero-stat-num{font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;color:var(--text)}
+    .hero-stat-lbl{font-size:0.75rem;color:var(--text-muted);margin-top:0.1rem}
+    .stat-div{width:1px;height:32px;background:var(--border)}
+
+    /* ── AD MID ── */
+    .ad-mid{max-width:1080px;margin:0 auto;padding:0 1.5rem}
+    .ad-mid-inner{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:0.75rem 1.25rem;display:flex;align-items:center;gap:1rem;margin-bottom:2rem}
+    .ad-mid-slot{flex:1;height:90px;background:repeating-linear-gradient(90deg,var(--ad-grid) 0,var(--ad-grid) 1px,transparent 1px,transparent 24px),repeating-linear-gradient(0deg,var(--ad-grid) 0,var(--ad-grid) 1px,transparent 1px,transparent 24px);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:0.75rem}
+
+    /* ── MAIN LAYOUT ── */
+    .main-layout{max-width:1080px;margin:0 auto;padding:0 1.5rem 5rem;display:grid;grid-template-columns:1fr 280px;gap:1.5rem;align-items:start}
+    @media(max-width:860px){.main-layout{grid-template-columns:1fr}}
+
+    /* ── SIDEBAR ── */
+    .sidebar{display:flex;flex-direction:column;gap:1rem;position:sticky;top:74px}
+    .ad-sidebar{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:0.75rem;overflow:hidden}
+    .ad-sidebar-slot{width:100%;height:250px;background:repeating-linear-gradient(90deg,var(--ad-grid) 0,var(--ad-grid) 1px,transparent 1px,transparent 20px),repeating-linear-gradient(0deg,var(--ad-grid) 0,var(--ad-grid) 1px,transparent 1px,transparent 20px);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:0.75rem;flex-direction:column;gap:0.4rem}
+    .sidebar-info{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1.1rem}
+    .sidebar-info h4{font-family:'Space Grotesk',sans-serif;font-size:0.85rem;font-weight:700;margin-bottom:0.65rem;color:var(--text)}
+    .tip-item{display:flex;gap:0.5rem;margin-bottom:0.55rem;font-size:0.78rem;color:var(--text-muted2);line-height:1.45}
+    .tip-icon{flex-shrink:0;margin-top:1px}
+
+    /* ── TOOL CARD ── */
+    .tool-card{background:var(--bg-card);border:1px solid var(--border);border-radius:18px;overflow:hidden;box-shadow:var(--card-shadow)}
+    .tabs{display:flex;border-bottom:1px solid var(--border)}
+    .tab{flex:1;padding:0.9rem 1rem;text-align:center;cursor:pointer;font-family:'Inter',sans-serif;font-size:0.85rem;font-weight:600;color:var(--text-muted);background:none;border:none;border-bottom:2px solid transparent;transition:all 0.2s}
+    .tab:hover:not(.active){color:var(--text-muted2)}
+    .tab.active{color:var(--blue-bright);border-bottom-color:var(--blue-bright)}
+    .panel{padding:1.75rem;display:none}
+    .panel.active{display:block}
+
+    /* ── INPUTS ── */
+    .input-row{display:flex;gap:0.65rem}
+    .email-input{flex:1;padding:0.8rem 1rem;background:var(--bg-input);border:1.5px solid var(--border-light);border-radius:10px;color:var(--text);font-size:0.95rem;font-family:'Inter',sans-serif;outline:none;transition:border-color 0.2s,box-shadow 0.2s}
+    .email-input::placeholder{color:var(--text-muted)}
+    .email-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-glow)}
+    .btn-primary{padding:0.8rem 1.5rem;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:0.9rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:background 0.2s,transform 0.1s;white-space:nowrap;display:flex;align-items:center;gap:0.5rem}
+    .btn-primary:hover{background:#1D4ED8}
+    .btn-primary:active{transform:scale(0.98)}
+    .btn-primary:disabled{background:#93C5FD;color:#fff;cursor:not-allowed}
+    .btn-ghost{padding:0.8rem 1.25rem;border:1px solid var(--border-light);border-radius:10px;background:transparent;color:var(--text-muted2);font-size:0.875rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s}
+    .btn-ghost:hover{border-color:var(--blue);color:var(--blue-bright)}
+
+    /* ── RESULT ── */
+    .result-card{margin-top:1.25rem;border-radius:12px;padding:1.25rem 1.5rem;border:1px solid;display:none;animation:fadeSlide 0.3s ease}
+    @keyframes fadeSlide{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    .result-card.valid{background:var(--green-bg);border-color:var(--green-border)}
+    .result-card.invalid{background:var(--red-bg);border-color:var(--red-border)}
+    .result-card.risky{background:var(--yellow-bg);border-color:var(--yellow-border)}
+    .result-card.loading{background:var(--blue-soft);border-color:rgba(59,130,246,0.2)}
+    .result-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+    .result-left{display:flex;align-items:center;gap:0.75rem}
+    .result-emoji{font-size:1.5rem}
+    .result-label{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.05rem}
+    .result-label.valid{color:var(--green)}
+    .result-label.invalid{color:var(--red)}
+    .result-label.risky{color:var(--yellow)}
+    .result-label.loading{color:var(--blue-bright)}
+    .score-badge{font-size:0.8rem;font-weight:700;padding:0.25rem 0.65rem;border-radius:6px;font-family:'Space Grotesk',sans-serif}
+    .score-badge.high{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+    .score-badge.mid{background:var(--yellow-bg);color:var(--yellow);border:1px solid var(--yellow-border)}
+    .score-badge.low{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
+    .checks-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:0.4rem}
+    .check-pill{display:flex;align-items:center;gap:0.45rem;font-size:0.78rem;color:var(--text-muted2);padding:0.35rem 0.6rem;background:var(--check-pill);border-radius:6px}
+    .check-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+    .dot-green{background:var(--green)}.dot-red{background:var(--red)}.dot-yellow{background:var(--yellow)}.dot-grey{background:var(--text-muted)}
+    .mx-block{margin-top:0.75rem;padding:0.75rem;background:var(--mx-block);border-radius:8px;font-size:0.78rem;color:var(--text-muted2)}
+    .mx-block strong{display:block;margin-bottom:0.3rem}
+    .mx-block code{color:var(--blue-bright);font-size:0.75rem}
+    .smtp-block{margin-top:0.5rem;padding:0.6rem 0.75rem;background:var(--mx-block);border-radius:8px;font-size:0.78rem;color:var(--text-muted2);display:none}
+
+    /* ── BULK / UPLOAD ── */
+    .bulk-textarea{width:100%;min-height:190px;padding:0.9rem 1rem;background:var(--bg-input);border:1.5px solid var(--border-light);border-radius:10px;color:var(--text);font-family:'Inter',sans-serif;font-size:0.88rem;line-height:1.7;resize:vertical;outline:none;transition:border-color 0.2s}
+    .bulk-textarea::placeholder{color:var(--text-muted)}
+    .bulk-textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-glow)}
+    .textarea-hint{font-size:0.75rem;color:var(--text-muted);margin-top:0.4rem}
+    .bulk-actions{display:flex;gap:0.65rem;margin-top:1rem;flex-wrap:wrap}
+    .drop-zone{border:1.5px dashed var(--border-light);border-radius:14px;padding:3rem 2rem;text-align:center;cursor:pointer;transition:all 0.2s}
+    .drop-zone:hover,.drop-zone.drag-over{border-color:var(--blue);background:var(--blue-soft)}
+    .drop-icon{font-size:2.25rem;margin-bottom:0.75rem}
+    .drop-zone h3{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1rem;margin-bottom:0.35rem;color:var(--text)}
+    .drop-zone p{color:var(--text-muted);font-size:0.83rem}
+    .file-input-hidden{display:none}
+
+    /* ── PROGRESS BAR ── */
+    .progress-wrap{margin-top:1rem;display:none}
+    .progress-bar-bg{background:var(--border);border-radius:99px;height:6px;overflow:hidden;margin-bottom:0.4rem}
+    .progress-bar-fill{height:100%;background:var(--blue);border-radius:99px;width:0%;transition:width 0.3s}
+    .progress-label{font-size:0.75rem;color:var(--text-muted)}
+
+    /* ── RESULTS TABLE ── */
+    .results-section{margin-top:1.5rem;display:none}
+    .results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:0.75rem}
+    .results-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1rem;color:var(--text)}
+    .stats-row{display:flex;gap:0.5rem;flex-wrap:wrap}
+    .stat-chip{display:flex;align-items:center;gap:0.35rem;padding:0.3rem 0.7rem;border-radius:99px;font-size:0.75rem;font-weight:600}
+    .stat-chip.valid{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+    .stat-chip.risky{background:var(--yellow-bg);color:var(--yellow);border:1px solid var(--yellow-border)}
+    .stat-chip.invalid{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
+    .table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+    .results-table{width:100%;border-collapse:collapse;font-size:0.83rem}
+    .results-table th{text-align:left;padding:0.65rem 0.85rem;background:var(--table-head);color:var(--text-muted);font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid var(--border)}
+    .results-table td{padding:0.65rem 0.85rem;border-bottom:1px solid var(--border);color:var(--text-body)}
+    .results-table tr:last-child td{border-bottom:none}
+    .results-table tr:hover td{background:var(--blue-soft)}
+    .badge{display:inline-flex;align-items:center;gap:0.25rem;padding:0.2rem 0.55rem;border-radius:6px;font-size:0.72rem;font-weight:600}
+    .badge.valid{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+    .badge.invalid{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
+    .badge.risky{background:var(--yellow-bg);color:var(--yellow);border:1px solid var(--yellow-border)}
+    .export-row{margin-top:1rem;display:flex;gap:0.65rem;flex-wrap:wrap}
+    .export-btn{display:inline-flex;align-items:center;gap:0.45rem;padding:0.65rem 1.1rem;border:1px solid var(--border-light);border-radius:8px;background:var(--bg-mid);color:var(--text-muted2);font-size:0.82rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s}
+    .export-btn:hover{border-color:var(--blue);color:var(--blue-bright)}
+    .export-btn.green:hover{border-color:var(--green);color:var(--green)}
+    .export-btn.yellow:hover{border-color:var(--yellow);color:var(--yellow)}
+    .export-btn.red:hover{border-color:var(--red);color:var(--red)}
+
+    /* ── HOW IT WORKS ── */
+    .how-section{max-width:1080px;margin:0 auto;padding:0 1.5rem 5rem}
+    .section-eyebrow{text-align:center;font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--blue-bright);margin-bottom:0.75rem}
+    .section-h2{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.5rem;text-align:center;color:var(--text);margin-bottom:1.75rem;letter-spacing:-0.02em}
+    .how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+    @media(max-width:700px){.how-grid{grid-template-columns:1fr}}
+    .how-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.5rem}
+    .how-num{font-family:'Space Grotesk',sans-serif;font-size:2rem;font-weight:800;color:var(--border-light);line-height:1;margin-bottom:0.75rem}
+    .how-card h3{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:0.95rem;color:var(--text);margin-bottom:0.4rem}
+    .how-card p{font-size:0.82rem;color:var(--text-muted);line-height:1.55}
+
+    /* ── FEATURES ── */
+    .features-section{max-width:1080px;margin:0 auto;padding:0 1.5rem 5rem}
+    .feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+    @media(max-width:700px){.feature-grid{grid-template-columns:1fr}}
+    .feature-card{background:var(--bg-card);padding:1.4rem}
+    .feature-icon{font-size:1.3rem;margin-bottom:0.65rem}
+    .feature-card h3{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:0.9rem;color:var(--text);margin-bottom:0.35rem}
+    .feature-card p{font-size:0.8rem;color:var(--text-muted);line-height:1.55}
+
+    /* ── ABOUT ── */
+    .about-section{max-width:1080px;margin:0 auto;padding:0 1.5rem 5rem}
+    .about-inner{background:var(--bg-card);border:1px solid var(--border);border-radius:18px;padding:3rem;display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
+    @media(max-width:700px){.about-inner{grid-template-columns:1fr;padding:2rem}}
+    .about-inner h2{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.6rem;letter-spacing:-0.02em;margin-bottom:1rem;line-height:1.2;color:var(--text)}
+    .about-inner p{font-size:0.88rem;color:var(--text-muted2);line-height:1.7;margin-bottom:0.85rem}
+    .about-inner p:last-child{margin-bottom:0}
+    .about-stats{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    .about-stat{background:var(--bg-mid);border:1px solid var(--border);border-radius:12px;padding:1.25rem}
+    .about-stat-num{font-family:'Space Grotesk',sans-serif;font-size:1.75rem;font-weight:800;color:var(--blue-bright);margin-bottom:0.2rem}
+    .about-stat-lbl{font-size:0.78rem;color:var(--text-muted);line-height:1.4}
+
+    /* ── FOOTER ── */
+    .footer-wrap{border-top:1px solid var(--border);padding:2rem}
+    footer{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:1fr auto;align-items:center;gap:1.5rem}
+    @media(max-width:600px){footer{grid-template-columns:1fr}}
+    .footer-logo{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1rem;color:var(--text);display:flex;align-items:center;gap:0.4rem;margin-bottom:0.35rem}
+    .footer-copy{font-size:0.78rem;color:var(--text-muted)}
+    .footer-links{display:flex;gap:1.5rem;list-style:none}
+    .footer-links a{font-size:0.8rem;color:var(--text-muted);text-decoration:none;transition:color 0.2s}
+    .footer-links a:hover{color:var(--text)}
+
+    /* ── SPINNER ── */
+    .spinner{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.65s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* ── TYPO SUGGEST ── */
+    .typo-suggest{display:none;margin-top:0.6rem;padding:0.6rem 0.9rem;background:var(--blue-soft);border:1px solid rgba(59,130,246,0.25);border-radius:8px;font-size:0.82rem;color:var(--blue-bright);display:none;align-items:center;justify-content:space-between;gap:0.75rem;animation:fadeSlide 0.2s ease}
+    .typo-suggest.show{display:flex}
+    .typo-apply{background:none;border:1px solid var(--blue-bright);color:var(--blue-bright);border-radius:6px;padding:0.2rem 0.6rem;font-size:0.75rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;transition:all 0.15s}
+    .typo-apply:hover{background:var(--blue-bright);color:#fff}
+
+    /* ── DUPLICATE WARNING ── */
+    .dup-warning{display:none;margin-top:0.65rem;padding:0.65rem 1rem;background:var(--yellow-bg);border:1px solid var(--yellow-border);border-radius:8px;font-size:0.82rem;color:var(--yellow)}
+    .dup-warning.show{display:block}
+    .dup-list{margin-top:0.35rem;font-size:0.75rem;color:var(--text-muted2);line-height:1.6}
+    .link-error{background:var(--red-bg);border-color:var(--red-border);color:var(--red)}
+
+    /* ── SHEET LINK ── */
+    .sheet-link-divider{display:flex;align-items:center;gap:0.75rem;margin:1.25rem 0 0.85rem;color:var(--text-muted);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em}
+    .sheet-link-divider::before,.sheet-link-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+    /* ── HEALTH SCORE ── */
+    .health-card{background:var(--bg-mid);border:1px solid var(--border);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1rem}
+    .health-top{display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap}
+    .health-score-wrap{display:flex;align-items:baseline;gap:0.3rem;flex-shrink:0}
+    .health-score-num{font-family:'Space Grotesk',sans-serif;font-size:2.5rem;font-weight:800;line-height:1}
+    .health-score-pct{font-size:1rem;font-weight:600;color:var(--text-muted)}
+    .health-label{font-family:'Space Grotesk',sans-serif;font-size:0.85rem;font-weight:600;margin-bottom:0.15rem}
+    .health-verdict{font-size:0.78rem;color:var(--text-muted2)}
+    .health-bar-wrap{margin-top:0.9rem}
+    .health-bar-track{height:8px;border-radius:99px;overflow:hidden;display:flex;gap:2px;background:var(--border)}
+    .health-bar-seg{height:100%;border-radius:99px;transition:width 0.6s ease}
+    .health-bar-legend{display:flex;gap:1rem;margin-top:0.5rem;flex-wrap:wrap}
+    .health-legend-item{display:flex;align-items:center;gap:0.35rem;font-size:0.75rem;color:var(--text-muted2)}
+    .health-legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+    /* ── STATUS TOOLTIP ── */
+    .has-tip{position:relative;cursor:help}
+    .has-tip .tip-box{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--bg-mid);border:1px solid var(--border);color:var(--text-body);font-size:0.75rem;font-weight:400;line-height:1.45;padding:0.45rem 0.7rem;border-radius:8px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity 0.15s;z-index:50;box-shadow:0 4px 16px rgba(0,0,0,0.35);text-align:left;min-width:170px;white-space:normal;max-width:210px}
+    .has-tip:hover .tip-box{opacity:1}
+    .tip-box strong{display:block;margin-bottom:0.2rem;font-size:0.78rem}
+    .tip-box-action{display:block;margin-top:0.3rem;font-size:0.72rem;font-weight:700;text-decoration:none}
+    .tip-box-action.valid{color:var(--green)}
+    .tip-box-action.risky{color:var(--yellow)}
+    .tip-box-action.invalid{color:var(--red)}
+
+    /* ── NOTES CELL ── */
+    .note-cell{display:flex;flex-direction:column;gap:0.2rem}
+    .note-summary{font-size:0.78rem;color:var(--text-muted2);font-weight:500}
+    .note-action{font-size:0.72rem;font-weight:600;padding:0.15rem 0.45rem;border-radius:5px;display:inline-block;width:fit-content}
+    .note-action.valid{background:var(--green-bg);color:var(--green)}
+    .note-action.risky{background:var(--yellow-bg);color:var(--yellow)}
+    .note-action.invalid{background:var(--red-bg);color:var(--red)}
+
+    /* ── COLUMN PICKER ── */
+    .col-picker{margin-top:1rem;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1.25rem;display:none;animation:fadeSlide 0.25s ease}
+    .col-picker.show{display:block}
+    .col-picker h4{font-family:'Space Grotesk',sans-serif;font-size:0.9rem;font-weight:700;color:var(--text);margin-bottom:0.25rem}
+    .col-picker p{font-size:0.78rem;color:var(--text-muted);margin-bottom:0.85rem}
+    .col-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:0.5rem;margin-bottom:1rem}
+    .col-option{display:flex;align-items:flex-start;gap:0.5rem;padding:0.6rem 0.75rem;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;transition:all 0.15s;background:var(--bg-mid)}
+    .col-option:hover{border-color:var(--blue)}
+    .col-option.selected{border-color:var(--blue);background:var(--blue-soft)}
+    .col-option input[type=radio]{margin-top:2px;accent-color:var(--blue);flex-shrink:0}
+    .col-option>div{flex:1;min-width:0}
+    .col-name{font-size:0.82rem;font-weight:600;color:var(--text);margin-bottom:0.1rem;display:flex;align-items:center;gap:0.35rem;min-width:0}
+    .col-name-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+    .col-preview{font-size:0.72rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .col-email-badge{font-size:0.65rem;font-weight:700;background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);padding:0.1rem 0.4rem;border-radius:4px;flex-shrink:0}
+
+    /* ── HAMBURGER ── */
+    .hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;background:none;border:1px solid var(--border);border-radius:8px;cursor:pointer;padding:0 8px;flex-shrink:0}
+    .hamburger span{display:block;width:100%;height:2px;background:var(--text-muted);border-radius:2px;transition:all 0.25s}
+    .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+    .hamburger.open span:nth-child(2){opacity:0}
+    .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+    /* ── MOBILE NAV DRAWER ── */
+    .mobile-nav{display:none;position:fixed;inset:58px 0 0 0;background:var(--bg);z-index:99;padding:1.5rem;flex-direction:column;gap:0.25rem;border-top:1px solid var(--border)}
+    .mobile-nav.open{display:flex}
+    .mobile-nav a{display:block;padding:0.85rem 1rem;border-radius:10px;color:var(--text-muted2);text-decoration:none;font-size:1rem;font-weight:500;transition:background 0.2s,color 0.2s}
+    .mobile-nav a:hover,.mobile-nav a:active{background:var(--bg-card);color:var(--text)}
+
+    @media(max-width:860px){
+      .ad-banner{padding:0.6rem 1rem}
+      .nav-links{gap:1.1rem}
+      nav{padding:0 1.25rem}
+    }
+
+    @media(max-width:700px){
+      .about-inner{padding:1.5rem}
+      .how-section,.features-section,.about-section{padding-bottom:3rem}
+    }
+
+    @media(max-width:600px){
+      .hero{padding:3rem 1rem 2rem}
+      .hero h1{font-size:clamp(1.9rem,7vw,2.4rem)}
+      .hero-sub{font-size:0.95rem}
+      .ad-banner{padding:0.5rem 0.75rem;gap:0.5rem}
+      .ad-mid{padding:0 1rem}
+      .main-layout{padding:0 1rem 3rem}
+      .how-section,.features-section,.about-section{padding-left:1rem;padding-right:1rem}
+      .panel{padding:1.25rem 1rem}
+      .bulk-actions{flex-direction:column}
+      .bulk-actions .btn-ghost{width:100%;text-align:center}
+      .export-row{flex-direction:column}
+      .export-btn{width:100%;justify-content:center}
+      .results-header{flex-direction:column;align-items:flex-start}
+      .stats-row{width:100%}
+      .about-stat-num{font-size:1.4rem}
+      .footer-wrap{padding:1.5rem 1rem}
+      .sidebar{display:none}
+    }
+
+    @media(max-width:560px){
+      .input-row{flex-direction:column}
+      .btn-primary{width:100%;justify-content:center}
+      .nav-links{display:none}
+      .hamburger{display:flex}
+      .nav-status .status-label{display:none}
+      .hero-stats{gap:1rem}
+      .stat-div{display:none}
+      .hero-stat-num{font-size:1.2rem}
+      .tabs{overflow-x:auto;-webkit-overflow-scrolling:touch}
+      .tab{font-size:0.78rem;padding:0.75rem 0.65rem;white-space:nowrap}
+      .checks-grid{grid-template-columns:1fr 1fr}
+      .results-table th:nth-child(4),.results-table td:nth-child(4),
+      .results-table th:nth-child(5),.results-table td:nth-child(5){display:none}
+      .drop-zone{padding:2rem 1rem}
+      .section-h2{font-size:1.25rem}
+    }
+
+    @media(max-width:380px){
+      nav{padding:0 1rem}
+      .tab{font-size:0.72rem;padding:0.7rem 0.5rem}
+      .hero-stats{flex-direction:column;gap:0.75rem;align-items:center}
+      .hero-stat{display:flex;align-items:center;gap:0.5rem}
+      .hero-stat-lbl{margin-top:0}
+      .checks-grid{grid-template-columns:1fr}
+      .stat-chip{font-size:0.7rem}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="logo">
+    <div class="logo-icon">📡</div>
+    Pingbox
+  </a>
+  <ul class="nav-links">
+    <li><a href="#tool">Validate</a></li>
+    <li><a href="#how">How it works</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#about">About</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="nav-status">
+      <div class="status-dot" id="statusDot"></div>
+      <span class="status-label" id="statusText">Checking...</span>
+    </div>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode">☀️</button>
+    <button class="hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<div class="mobile-nav" id="mobileNav">
+  <a href="#tool" onclick="closeMobileNav()">Validate</a>
+  <a href="#how" onclick="closeMobileNav()">How it works</a>
+  <a href="#features" onclick="closeMobileNav()">Features</a>
+  <a href="#about" onclick="closeMobileNav()">About</a>
+</div>
+
+<!-- AD: TOP BANNER -->
+<div class="ad-banner">
+  <span class="ad-label">Ad</span>
+  <div class="ad-placeholder">728x90 leaderboard ad — connect Google AdSense or a direct sponsor</div>
+</div>
+
+<!-- OFFLINE BANNER -->
+<div class="offline-banner" id="offlineBanner">
+  MX backend offline. Results use syntax rules only. Double-click START-PINGBOX.bat then refresh.
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">📡 <span id="eyebrowText">Free · No signup · Real MX + SMTP</span></div>
+  <h1>Stop guessing.<br>Send emails to <span class="blue">real people.</span></h1>
+  <p class="hero-sub">Paste an email, upload your list, or drop a CSV. Pingbox pings the actual mail server and tells you if it's deliverable before you hit send.</p>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-num">6</div>
+      <div class="hero-stat-lbl">Verification layers</div>
+    </div>
+    <div class="stat-div"></div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">2,000+</div>
+      <div class="hero-stat-lbl">Disposable domains blocked</div>
+    </div>
+    <div class="stat-div"></div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">100%</div>
+      <div class="hero-stat-lbl">Free, always</div>
+    </div>
+    <div class="stat-div"></div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">1,000</div>
+      <div class="hero-stat-lbl">Emails per bulk run</div>
+    </div>
+  </div>
+</div>
+
+<!-- AD: MID -->
+<div class="ad-mid">
+  <div class="ad-mid-inner">
+    <span class="ad-label">Ad</span>
+    <div class="ad-mid-slot">728x90 mid-page ad — high visibility between hero and tool</div>
+  </div>
+</div>
+
+<!-- MAIN TOOL + SIDEBAR -->
+<div class="main-layout" id="tool">
+  <div>
+    <div class="tool-card">
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('single',this)">Single Email</button>
+        <button class="tab" onclick="switchTab('bulk',this)">Bulk Paste</button>
+        <button class="tab" onclick="switchTab('upload',this)">Upload CSV</button>
+      </div>
+
+      <!-- SINGLE -->
+      <div class="panel active" id="panel-single">
+        <div class="input-row">
+          <input class="email-input" id="singleInput" type="email" placeholder="name@company.com"
+            oninput="clearSingleResult();checkTypo()" onkeydown="if(event.key==='Enter')validateSingle()" />
+          <button class="btn-primary" id="singleBtn" onclick="validateSingle()">Check Email</button>
+        </div>
+        <div class="typo-suggest" id="typoSuggest">
+          <span id="typoMsg"></span>
+          <button class="typo-apply" id="typoBtn" onclick="applyTypo()">Use this</button>
+        </div>
+        <div class="result-card" id="singleResult">
+          <div class="result-top">
+            <div class="result-left">
+              <span class="result-emoji" id="resEmoji"></span>
+              <span class="result-label" id="resLabel"></span>
+            </div>
+            <span class="score-badge" id="resBadge"></span>
+          </div>
+          <div class="checks-grid" id="resChecks"></div>
+          <div class="mx-block" id="resMX" style="display:none"></div>
+          <div class="smtp-block" id="resSMTP"></div>
+        </div>
+      </div>
+
+      <!-- BULK -->
+      <div class="panel" id="panel-bulk">
+        <textarea class="bulk-textarea" id="bulkInput" oninput="checkDuplicates()" placeholder="Paste emails here, one per line or comma-separated.
+
+hello@company.com
+info@brand.org
+test@fakeemail..."></textarea>
+        <div class="dup-warning" id="dupWarning">
+          <strong>⚠️ Duplicates found</strong> — <span id="dupCount"></span> emails appear more than once and will be removed before validating.
+          <div class="dup-list" id="dupList"></div>
+        </div>
+        <p class="textarea-hint">Up to 1,000 emails. Duplicates removed automatically.</p>
+        <div class="bulk-actions">
+          <button class="btn-primary" id="bulkBtn" onclick="validateBulk()">Validate All</button>
+          <button class="btn-ghost" onclick="clearBulk()">Clear</button>
+        </div>
+        <div class="progress-wrap" id="bulkProgress">
+          <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+          <div class="progress-label" id="progressLabel">Validating...</div>
+        </div>
+        <div class="results-section" id="bulkResults"></div>
+      </div>
+
+      <!-- UPLOAD -->
+      <div class="panel" id="panel-upload">
+        <div class="drop-zone" id="dropZone"
+          onclick="document.getElementById('csvFile').click()"
+          ondragover="handleDragOver(event)" ondragleave="handleDragLeave()" ondrop="handleDrop(event)">
+          <div class="drop-icon">📂</div>
+          <h3>Drop your CSV or Excel file here</h3>
+          <p>or click to browse. Email column detected automatically.</p>
+          <p style="margin-top:0.5rem;font-size:0.75rem;color:var(--text-muted)">Supports .csv, .txt, .xlsx, .xls · Validates up to 1,000 emails per run</p>
+        </div>
+        <input type="file" class="file-input-hidden" id="csvFile" accept=".csv,.txt,.xlsx,.xls" onchange="handleFileSelect(event)" />
+
+        <div class="sheet-link-divider"><span>or paste a sheet link</span></div>
+        <div class="input-row">
+          <input class="email-input" id="sheetLinkInput" type="url" placeholder="Google Sheets or Dropbox link..."
+            onkeydown="if(event.key==='Enter')processSheetLink()" />
+          <button class="btn-primary" id="sheetLinkBtn" onclick="processSheetLink()">🔗 Fetch & Validate</button>
+        </div>
+        <p class="textarea-hint">Sheet must be shared as "Anyone with the link can view." Nothing is uploaded to us — your browser fetches it directly.</p>
+        <div class="dup-warning link-error" id="sheetLinkError"></div>
+
+        <div class="col-picker" id="colPicker">
+          <h4>Which column has the email addresses?</h4>
+          <p>We found multiple columns — pick the right one and we'll extract emails from it.</p>
+          <div class="col-grid" id="colGrid"></div>
+          <button class="btn-primary" onclick="confirmColumn()">Validate Selected Column</button>
+        </div>
+        <div class="progress-wrap" id="uploadProgress">
+          <div class="progress-bar-bg"><div class="progress-bar-fill" id="uploadProgressFill"></div></div>
+          <div class="progress-label" id="uploadProgressLabel">Validating...</div>
+        </div>
+        <div class="results-section" id="uploadResults"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="ad-sidebar">
+      <div class="ad-label" style="margin-bottom:0.5rem">Ad</div>
+      <div class="ad-sidebar-slot">
+        <span>📐</span>
+        <span>300x250 sidebar ad</span>
+        <span style="font-size:0.65rem;color:var(--text-muted)">Connect AdSense or direct sponsor</span>
+      </div>
+    </div>
+    <div class="sidebar-info" style="display:none">
+      <h4>💡 Pro tips</h4>
+      <div class="tip-item"><span class="tip-icon">🎯</span><span>Remove role-based emails (info@, support@) before sending. They hurt open rates.</span></div>
+      <div class="tip-item"><span class="tip-icon">🔄</span><span>Re-validate lists older than 6 months. Inboxes go stale fast.</span></div>
+      <div class="tip-item"><span class="tip-icon">📊</span><span>A bounce rate above 2% can get your sending domain blacklisted.</span></div>
+      <div class="tip-item"><span class="tip-icon">✅</span><span>Only import Valid emails into Mailchimp or HubSpot for best deliverability.</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="how-section" id="how">
+  <p class="section-eyebrow">How it works</p>
+  <h2 class="section-h2">Three steps. No signup.</h2>
+  <div class="how-grid">
+    <div class="how-card">
+      <div class="how-num">01</div>
+      <h3>Paste or upload</h3>
+      <p>Type one email, paste a list, or drop a CSV file. Pingbox handles any format automatically.</p>
+    </div>
+    <div class="how-card">
+      <div class="how-num">02</div>
+      <h3>We ping the server</h3>
+      <p>Pingbox checks syntax, DNS, MX records, and does a real SMTP handshake with the mail server.</p>
+    </div>
+    <div class="how-card">
+      <div class="how-num">03</div>
+      <h3>Download your clean list</h3>
+      <p>Get a confidence score for every email. Export valid-only as CSV, ready for your next campaign.</p>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<div class="features-section" id="features">
+  <p class="section-eyebrow">What Pingbox checks</p>
+  <h2 class="section-h2">Six layers of verification</h2>
+  <div class="feature-grid">
+    <div class="feature-card"><div class="feature-icon">🔤</div><h3>Syntax</h3><p>Catches typos, missing @, bad characters, and malformed addresses instantly.</p></div>
+    <div class="feature-card"><div class="feature-icon">🌐</div><h3>Domain lookup</h3><p>Confirms the domain actually exists via live DNS resolution.</p></div>
+    <div class="feature-card"><div class="feature-icon">📬</div><h3>MX record check</h3><p>Pings the real mail server to confirm it can receive email at all.</p></div>
+    <div class="feature-card"><div class="feature-icon">🤝</div><h3>SMTP handshake</h3><p>Goes one step further and asks the server directly if this specific mailbox exists.</p></div>
+    <div class="feature-card"><div class="feature-icon">🗑️</div><h3>Disposable detection</h3><p>Flags 2,000+ throwaway inbox providers like Mailinator and YOPMail.</p></div>
+    <div class="feature-card"><div class="feature-icon">🎯</div><h3>Role-based flags</h3><p>Detects shared inboxes like info@ and support@ that hurt open rates.</p></div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div class="about-section" id="about">
+  <div class="about-inner">
+    <div>
+      <h2>Simple enough for anyone. Powerful enough for any team.</h2>
+      <p>Whether you are a marketer cleaning a lead list, a founder verifying signups, or a developer building an email pipeline, Pingbox gives you fast, accurate results with no setup and no cost.</p>
+      <p>Most validation tools are overpriced, overly technical, or require you to hand over your contact list to a third party. Pingbox runs locally. Your data never leaves your computer.</p>
+      <p>Pingbox is free and will stay free. We keep the lights on through unobtrusive ads. No paywalls, no credit card, no account needed.</p>
+    </div>
+    <div class="about-stats">
+      <div class="about-stat">
+        <div class="about-stat-num">6</div>
+        <div class="about-stat-lbl">Verification checks per email</div>
+      </div>
+      <div class="about-stat">
+        <div class="about-stat-num">0</div>
+        <div class="about-stat-lbl">Data sent to any external server</div>
+      </div>
+      <div class="about-stat">
+        <div class="about-stat-num">1,000</div>
+        <div class="about-stat-lbl">Emails per bulk run</div>
+      </div>
+      <div class="about-stat">
+        <div class="about-stat-num">Free</div>
+        <div class="about-stat-lbl">Forever. No hidden tiers.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer-wrap">
+  <footer>
+    <div>
+      <div class="footer-logo">📡 Pingbox</div>
+      <p class="footer-copy">Free email validation for everyone. Your data stays on your computer.</p>
+    </div>
+    <ul class="footer-links">
+      <li><a href="#tool">Validate</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#about">About</a></li>
+    </ul>
+  </footer>
+</div>
+
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script>
+const API='http://127.0.0.1:3456';
+const BULK_LIMIT=1000; // matches server.js cap — keep these in sync
+let serverOnline=false;
+
+// ── THEME ────────────────────────────────────────────────────────
+function toggleTheme(){
+  const html=document.documentElement;
+  const isDark=html.getAttribute('data-theme')==='dark';
+  html.setAttribute('data-theme',isDark?'light':'dark');
+  document.getElementById('themeToggle').textContent=isDark?'🌙':'☀️';
+  localStorage.setItem('pingbox-theme',isDark?'light':'dark');
+}
+(function(){
+  const saved=localStorage.getItem('pingbox-theme')||'dark';
+  document.documentElement.setAttribute('data-theme',saved);
+  document.getElementById('themeToggle').textContent=saved==='dark'?'☀️':'🌙';
+})();
+
+// ── SERVER CHECK ─────────────────────────────────────────────────
+// Only a visitor running Pingbox locally (file:// or localhost/127.0.0.1)
+// could possibly have server.js running on their own machine. Anywhere
+// else (e.g. a GitHub Pages demo), skip the ping entirely — it would
+// always fail, waste a timeout every 10s, and show a misleading
+// "offline" warning for something that was never expected to work.
+const isLocalEnv=location.protocol==='file:'||['localhost','127.0.0.1'].includes(location.hostname);
+
+async function checkServer(){
+  try{
+    const r=await fetch(API+'/ping',{signal:AbortSignal.timeout(2500)});
+    if(r.ok){
+      serverOnline=true;
+      document.getElementById('statusDot').className='status-dot online';
+      document.getElementById('statusText').textContent='MX + SMTP live';
+      document.getElementById('offlineBanner').classList.remove('show','info');
+      document.getElementById('eyebrowText').textContent='Free · No signup · Real MX + SMTP';
+    }
+  }catch{
+    serverOnline=false;
+    document.getElementById('statusDot').className='status-dot offline';
+    document.getElementById('statusText').textContent='MX offline';
+    document.getElementById('offlineBanner').classList.remove('info');
+    document.getElementById('offlineBanner').innerHTML='MX backend offline. Results use syntax rules only. Double-click START-PINGBOX.bat then refresh.';
+    document.getElementById('offlineBanner').classList.add('show');
+    document.getElementById('eyebrowText').textContent='Free · No signup · Instant checks';
+  }
+}
+
+function setDemoMode(){
+  serverOnline=false;
+  document.getElementById('statusDot').className='status-dot demo';
+  document.getElementById('statusText').textContent='Demo mode';
+  document.getElementById('offlineBanner').innerHTML='You\'re using the hosted demo — checks run instantly in your browser (syntax, disposable, role-based). <a href="README.md" target="_blank">Run Pingbox locally</a> for full MX + SMTP verification.';
+  document.getElementById('offlineBanner').classList.add('show','info');
+  document.getElementById('eyebrowText').textContent='Free · No signup · Instant checks';
+}
+
+if(isLocalEnv){
+  checkServer();setInterval(checkServer,10000);
+}else{
+  setDemoMode();
+}
+
+// ── TABS ─────────────────────────────────────────────────────────
+function switchTab(tab,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-'+tab).classList.add('active');
+}
+
+// ── CLIENT FALLBACK ───────────────────────────────────────────────
+const DISPOSABLE=new Set(['mailinator.com','guerrillamail.com','tempmail.com','10minutemail.com','yopmail.com','trashmail.com','fakeinbox.com','maildrop.cc','sharklasers.com','grr.la','spam4.me','dispostable.com','tempr.email','discard.email','throwaway.email']);
+const ROLE=['info','support','admin','help','contact','sales','no-reply','noreply','webmaster','postmaster','abuse','hello','office','team','hr','feedback','marketing','billing','newsletter','enquiry','enquiries'];
+const FREE=new Set(['gmail.com','yahoo.com','hotmail.com','outlook.com','icloud.com','aol.com','mail.com','protonmail.com','live.com','msn.com','me.com','mac.com']);
+
+function clientValidate(email){
+  const r={email,status:'valid',score:100,mxRecords:[],smtpResult:null,smtpDetail:null,reasons:[]};
+  const t=email.trim().toLowerCase();
+  const re=/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+  if(!re.test(t)||t.includes('..')){return{...r,status:'invalid',score:0,reasons:[{label:'Invalid syntax',type:'red'}]};}
+  const[local,domain]=t.split('@');
+  r.reasons.push({label:'Syntax valid',type:'green'});
+  if(DISPOSABLE.has(domain)){r.status='invalid';r.score-=70;r.reasons.push({label:'Disposable inbox',type:'red'});}
+  else r.reasons.push({label:'Not disposable',type:'green'});
+  const isRole=ROLE.some(p=>local===p||local.startsWith(p+'.'));
+  if(isRole){if(r.status!=='invalid')r.status='risky';r.score-=20;r.reasons.push({label:'Role-based address',type:'yellow'});}
+  else r.reasons.push({label:'Personal address',type:'green'});
+  if(FREE.has(domain)){r.score-=5;r.reasons.push({label:'Free provider',type:'yellow'});}
+  else r.reasons.push({label:'Business domain',type:'green'});
+  r.reasons.push({label:'MX/SMTP check requires server',type:'grey'});
+  r.score=Math.max(0,Math.min(100,r.score));
+  if(r.status!=='invalid'){
+    if(r.score===0)r.status='invalid';
+    else if(r.score<75||r.status==='risky')r.status='risky';
+  }
+  return r;
+}
+
+// ── FEATURE 1: EMAIL TYPO SUGGESTER ──────────────────────────────
+const KNOWN_DOMAINS=['gmail.com','yahoo.com','hotmail.com','outlook.com','icloud.com','aol.com','mail.com','protonmail.com','live.com','msn.com','me.com','mac.com','googlemail.com','ymail.com','yahoo.co.uk','yahoo.co.in','zoho.com'];
+let _typoSuggestion=null;
+
+function levenshtein(a,b){
+  const m=a.length,n=b.length;
+  const dp=Array.from({length:m+1},(_,i)=>Array.from({length:n+1},(_,j)=>j===0?i:0));
+  for(let j=1;j<=n;j++)dp[0][j]=j;
+  for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)
+    dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+  return dp[m][n];
+}
+
+function checkTypo(){
+  const val=document.getElementById('singleInput').value.trim();
+  const el=document.getElementById('typoSuggest');
+  _typoSuggestion=null;
+  if(!val.includes('@')){el.classList.remove('show');return;}
+  const[local,domain]=val.split('@');
+  if(!domain||domain.length<3){el.classList.remove('show');return;}
+  if(KNOWN_DOMAINS.includes(domain.toLowerCase())){el.classList.remove('show');return;}
+  let best=null,bestDist=Infinity;
+  for(const d of KNOWN_DOMAINS){
+    const dist=levenshtein(domain.toLowerCase(),d);
+    if(dist<bestDist&&dist<=2){bestDist=dist;best=d;}
+  }
+  if(best){
+    _typoSuggestion=local+'@'+best;
+    document.getElementById('typoMsg').textContent=`Did you mean ${_typoSuggestion}?`;
+    el.classList.add('show');
+  }else{
+    el.classList.remove('show');
+  }
+}
+
+function applyTypo(){
+  if(!_typoSuggestion)return;
+  document.getElementById('singleInput').value=_typoSuggestion;
+  document.getElementById('typoSuggest').classList.remove('show');
+  _typoSuggestion=null;
+}
+
+// ── SINGLE ────────────────────────────────────────────────────────
+async function validateSingle(){
+  const input=document.getElementById('singleInput');
+  const email=input.value.trim();
+  if(!email){input.focus();return;}
+  const btn=document.getElementById('singleBtn');
+  const card=document.getElementById('singleResult');
+  btn.innerHTML='<span class="spinner"></span> Checking...';btn.disabled=true;
+  card.className='result-card loading';card.style.display='block';
+  document.getElementById('resEmoji').textContent='⏳';
+  document.getElementById('resLabel').className='result-label loading';
+  document.getElementById('resLabel').textContent=serverOnline?'Pinging mail server...':'Checking...';
+  document.getElementById('resBadge').textContent='';
+  document.getElementById('resChecks').innerHTML='';
+  document.getElementById('resMX').style.display='none';
+  document.getElementById('resSMTP').style.display='none';
+  let result;
+  if(serverOnline){
+    try{const resp=await fetch(`${API}/validate?email=${encodeURIComponent(email)}`);result=await resp.json();}
+    catch{result=clientValidate(email);}
+  }else{await new Promise(r=>setTimeout(r,500));result=clientValidate(email);}
+  btn.innerHTML='Check Email';btn.disabled=false;
+  renderSingleResult(result);
+}
+
+function renderSingleResult(r){
+  const card=document.getElementById('singleResult');
+  card.className='result-card '+r.status;
+  const icons={valid:'✅',invalid:'❌',risky:'⚠️'};
+  const labels={valid:'Deliverable',invalid:'Undeliverable',risky:'Risky - use with caution'};
+  document.getElementById('resEmoji').textContent=icons[r.status];
+  const lbl=document.getElementById('resLabel');
+  lbl.textContent=labels[r.status];lbl.className='result-label '+r.status;
+  const badge=document.getElementById('resBadge');
+  const cls=r.score>=75?'high':r.score>=40?'mid':'low';
+  badge.className='score-badge '+cls;badge.textContent=r.score+'/100';
+  const dotMap={red:'dot-red',green:'dot-green',yellow:'dot-yellow',grey:'dot-grey'};
+  document.getElementById('resChecks').innerHTML=r.reasons.map(rc=>`<div class="check-pill"><span class="check-dot ${dotMap[rc.type]||'dot-grey'}"></span>${rc.label}</div>`).join('');
+  const mxEl=document.getElementById('resMX');
+  if(r.mxRecords&&r.mxRecords.length>0){mxEl.style.display='block';mxEl.innerHTML=`<strong>MX Records</strong>${r.mxRecords.map(m=>`<code>${m}</code>`).join('  ')}`;}
+  else mxEl.style.display='none';
+  const smtpEl=document.getElementById('resSMTP');
+  if(r.smtpResult&&r.smtpDetail){
+    smtpEl.style.display='block';
+    const sc={valid:'var(--green)',invalid:'var(--red)',unknown:'var(--yellow)'}[r.smtpResult]||'var(--text-muted)';
+    smtpEl.innerHTML=`<strong>SMTP:</strong> <span style="color:${sc}">${r.smtpDetail}</span>`;
+  }else smtpEl.style.display='none';
+}
+function clearSingleResult(){
+  document.getElementById('singleResult').style.display='none';
+}
+
+// ── FEATURE 2: DUPLICATE FINDER ───────────────────────────────────
+function parseEmailsRaw(text){
+  return text.split(/[\n,;]+/).map(e=>e.trim().toLowerCase()).filter(e=>e.length>0);
+}
+function parseEmails(text){return[...new Set(parseEmailsRaw(text))];}
+
+function checkDuplicates(){
+  const raw=parseEmailsRaw(document.getElementById('bulkInput').value);
+  const seen=new Map();
+  raw.forEach(e=>{seen.set(e,(seen.get(e)||0)+1);});
+  const dupes=[...seen.entries()].filter(([,c])=>c>1);
+  const el=document.getElementById('dupWarning');
+  if(dupes.length===0){el.classList.remove('show');return;}
+  document.getElementById('dupCount').textContent=dupes.length;
+  document.getElementById('dupList').textContent=dupes.map(([e,c])=>`${e} (×${c})`).join(', ');
+  el.classList.add('show');
+}
+
+// ── BULK ──────────────────────────────────────────────────────────
+async function validateBulk(){
+  const allParsed=parseEmails(document.getElementById('bulkInput').value);
+  if(!allParsed.length)return;
+  const emails=allParsed.slice(0,BULK_LIMIT);
+  const btn=document.getElementById('bulkBtn');
+  btn.innerHTML='<span class="spinner"></span> Validating...';btn.disabled=true;
+  if(allParsed.length>emails.length){
+    const note=document.createElement('p');
+    note.style.cssText='color:var(--yellow);font-size:0.8rem;margin-bottom:0.75rem';
+    note.textContent=`Pasted ${allParsed.length} emails — validating the first ${emails.length} (max per run).`;
+    document.getElementById('bulkResults').before(note);
+    setTimeout(()=>note.remove(),8000);
+  }
+  showProgress('bulkProgress','progressFill','progressLabel',0,emails.length);
+  let results;
+  if(serverOnline){
+    try{
+      const resp=await fetch(`${API}/validate-bulk`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({emails})});
+      const data=await resp.json();results=data.results;
+      showProgress('bulkProgress','progressFill','progressLabel',emails.length,emails.length);
+    }catch{results=emails.map(clientValidate);}
+  }else{
+    results=[];
+    for(let i=0;i<emails.length;i++){
+      results.push(clientValidate(emails[i]));
+      if(i%10===0)showProgress('bulkProgress','progressFill','progressLabel',i,emails.length);
+      await new Promise(r=>setTimeout(r,5));
+    }
+  }
+  btn.innerHTML='Validate All';btn.disabled=false;
+  document.getElementById('bulkProgress').style.display='none';
+  document.getElementById('dupWarning').classList.remove('show');
+  renderBulkResults(results,'bulkResults');
+}
+
+function showProgress(wrapId,fillId,labelId,done,total){
+  document.getElementById(wrapId).style.display='block';
+  const pct=total>0?Math.round((done/total)*100):0;
+  document.getElementById(fillId).style.width=pct+'%';
+  document.getElementById(labelId).textContent=`Validated ${done} of ${total} emails (${pct}%)`;
+}
+
+function clearBulk(){
+  document.getElementById('bulkInput').value='';
+  const el=document.getElementById('bulkResults');el.style.display='none';el.innerHTML='';
+  document.getElementById('bulkProgress').style.display='none';
+  document.getElementById('dupWarning').classList.remove('show');
+}
+
+// ── FEATURE 3: LIST HEALTH SCORE ─────────────────────────────────
+function renderHealthScore(results,container){
+  const total=results.length;
+  if(!total)return;
+  const valid=results.filter(r=>r.status==='valid').length;
+  const risky=results.filter(r=>r.status==='risky').length;
+  const invalid=results.filter(r=>r.status==='invalid').length;
+  const score=Math.round((valid*100+risky*50)/(total*100)*100);
+  const color=score>=75?'var(--green)':score>=50?'var(--yellow)':'var(--red)';
+  const verdict=score>=75?'Great shape! Safe to send.':score>=50?'Needs cleanup before sending.':'High risk — clean this list first.';
+  const vPct=Math.round(valid/total*100);
+  const rPct=Math.round(risky/total*100);
+  const iPct=100-vPct-rPct;
+  const card=document.createElement('div');
+  card.className='health-card';
+  card.innerHTML=`
+    <div class="health-top">
+      <div class="health-score-wrap">
+        <span class="health-score-num" style="color:${color}">${score}</span>
+        <span class="health-score-pct">/ 100</span>
+      </div>
+      <div>
+        <div class="health-label" style="color:${color}">Your list is ${score}% healthy</div>
+        <div class="health-verdict">${verdict}</div>
+      </div>
+    </div>
+    <div class="health-bar-wrap">
+      <div class="health-bar-track">
+        <div class="health-bar-seg" style="width:${vPct}%;background:var(--green)"></div>
+        <div class="health-bar-seg" style="width:${rPct}%;background:var(--yellow)"></div>
+        <div class="health-bar-seg" style="width:${iPct}%;background:var(--red)"></div>
+      </div>
+      <div class="health-bar-legend">
+        <span class="health-legend-item"><span class="health-legend-dot" style="background:var(--green)"></span>${valid} valid (${vPct}%)</span>
+        <span class="health-legend-item"><span class="health-legend-dot" style="background:var(--yellow)"></span>${risky} risky (${rPct}%)</span>
+        <span class="health-legend-item"><span class="health-legend-dot" style="background:var(--red)"></span>${invalid} invalid (${iPct}%)</span>
+      </div>
+    </div>`;
+  container.prepend(card);
+}
+
+// ── FEATURE 4: COPY VALID EMAILS ─────────────────────────────────
+function copyValidEmails(emails){
+  const text=emails.map(r=>r.email).join('\n');
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=document.getElementById('copyValidBtn');
+    if(!btn)return;
+    const orig=btn.innerHTML;
+    btn.innerHTML='✅ Copied!';
+    setTimeout(()=>{btn.innerHTML=orig;},2000);
+  });
+}
+
+// ── SMART NOTES ──────────────────────────────────────────────────
+function smartNote(r){
+  const labels=r.reasons.map(x=>x.label);
+  const has=s=>labels.some(l=>l.toLowerCase().includes(s));
+
+  if(r.status==='invalid'){
+    if(has('invalid syntax'))return{summary:'Malformed address',action:'Fix or remove',cls:'invalid'};
+    if(has('disposable'))   return{summary:'Throwaway inbox',action:'Remove from list',cls:'invalid'};
+    if(has('domain does'))  return{summary:'Domain not found',action:'Remove from list',cls:'invalid'};
+    if(has('no mx'))        return{summary:'No mail server',action:'Remove from list',cls:'invalid'};
+    if(has('mailbox rej')||has('smtp'))return{summary:'Mailbox rejected',action:'Remove from list',cls:'invalid'};
+    return{summary:'Cannot receive mail',action:'Remove from list',cls:'invalid'};
+  }
+  if(r.status==='risky'){
+    if(has('role'))         return{summary:'Shared team inbox',action:'Find direct contact',cls:'risky'};
+    if(has('disposable'))   return{summary:'Throwaway inbox',action:'Use with caution',cls:'risky'};
+    if(has('free provider'))return{summary:'Personal address',action:'OK for B2C campaigns',cls:'risky'};
+    return{summary:'Deliverable with caveats',action:'Review before sending',cls:'risky'};
+  }
+  // valid
+  if(has('smtp')&&has('confirmed'))return{summary:'Mailbox confirmed',action:'Safe to send',cls:'valid'};
+  if(has('mx verified'))           return{summary:'Mail server verified',action:'Safe to send',cls:'valid'};
+  return{summary:'Looks deliverable',action:'Safe to send',cls:'valid'};
+}
+
+const STATUS_TIPS={
+  valid:`<strong>✅ Valid</strong>Syntax is correct, domain exists, and the mail server accepted this address.<span class="tip-box-action valid">→ Safe to add to your campaign</span>`,
+  risky:`<strong>⚠️ Risky</strong>Address is real but has flags — shared inbox, free provider, or inconclusive SMTP.<span class="tip-box-action risky">→ Review before sending</span>`,
+  invalid:`<strong>❌ Invalid</strong>This address doesn't exist, has no mail server, or was rejected by SMTP.<span class="tip-box-action invalid">→ Remove from your list</span>`
+};
+
+// ── RESULTS RENDERER ─────────────────────────────────────────────
+function renderBulkResults(results,id){
+  const container=document.getElementById(id);
+  const valid=results.filter(r=>r.status==='valid');
+  const invalid=results.filter(r=>r.status==='invalid');
+  const risky=results.filter(r=>r.status==='risky');
+  container.style.display='block';
+  container.innerHTML=`
+    <div class="results-header">
+      <span class="results-title">${results.length} emails checked</span>
+      <div class="stats-row">
+        <span class="stat-chip valid">✅ ${valid.length} Valid</span>
+        <span class="stat-chip risky">⚠️ ${risky.length} Risky</span>
+        <span class="stat-chip invalid">❌ ${invalid.length} Invalid</span>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="results-table">
+        <thead><tr><th>Email</th><th>Status</th><th>Score</th><th>What to do</th></tr></thead>
+        <tbody>${results.map(r=>{
+          const note=smartNote(r);
+          const scoreColor=r.score>=75?'var(--green)':r.score>=40?'var(--yellow)':'var(--red)';
+          return`<tr>
+            <td style="font-weight:500">${r.email}</td>
+            <td><span class="badge ${r.status} has-tip">${r.status.charAt(0).toUpperCase()+r.status.slice(1)}<span class="tip-box">${STATUS_TIPS[r.status]||''}</span></span></td>
+            <td style="font-weight:700;color:${scoreColor}">${r.score}/100</td>
+            <td><div class="note-cell"><span class="note-summary">${note.summary}</span><span class="note-action ${note.cls}">${note.action}</span></div></td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>
+    </div>
+    <div class="export-row">
+      <button class="export-btn" onclick='exportCSV(${JSON.stringify(results)})'>⬇ Download All (CSV)</button>
+      <button class="export-btn green" onclick='exportCSV(${JSON.stringify(valid)})'>⬇ Valid Only (CSV)</button>
+      ${risky.length?`<button class="export-btn yellow" onclick='exportCSV(${JSON.stringify(risky)})'>⬇ Risky Only (CSV)</button>`:''}
+      ${invalid.length?`<button class="export-btn red" onclick='exportCSV(${JSON.stringify(invalid)})'>⬇ Invalid Only (CSV)</button>`:''}
+      <button class="export-btn" id="copyValidBtn" onclick='copyValidEmails(${JSON.stringify(valid)})'>📋 Copy Valid Emails</button>
+    </div>`;
+  renderHealthScore(results,container);
+}
+
+// ── FEATURE 5: COLUMN PICKER FOR CSV ─────────────────────────────
+let _parsedCSVRows=[];
+let _selectedColIndex=null;
+
+function parseCSV(text){
+  const lines=text.split(/\r?\n/).filter(l=>l.trim());
+  return lines.map(line=>{
+    const cols=[];let cur='';let inQ=false;
+    for(let i=0;i<line.length;i++){
+      const ch=line[i];
+      if(ch==='"'){inQ=!inQ;}
+      else if(ch===','&&!inQ){cols.push(cur.trim());cur='';}
+      else{cur+=ch;}
+    }
+    cols.push(cur.trim());
+    return cols;
+  });
+}
+
+const EMAIL_RE=/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+
+function scoreColumnForEmails(rows,colIdx){
+  const sample=rows.slice(1,Math.min(rows.length,11));
+  const hits=sample.filter(r=>r[colIdx]&&EMAIL_RE.test(r[colIdx].trim())).length;
+  return sample.length?hits/sample.length:0;
+}
+
+function handleDragOver(e){e.preventDefault();document.getElementById('dropZone').classList.add('drag-over');}
+function handleDragLeave(){document.getElementById('dropZone').classList.remove('drag-over');}
+function handleDrop(e){e.preventDefault();document.getElementById('dropZone').classList.remove('drag-over');const f=e.dataTransfer.files[0];if(f)processFile(f);}
+function handleFileSelect(e){const f=e.target.files[0];if(f)processFile(f);}
+
+function resetUploadUI(){
+  document.getElementById('colPicker').classList.remove('show');
+  document.getElementById('uploadResults').style.display='none';
+  document.getElementById('uploadResults').innerHTML='';
+  document.getElementById('sheetLinkError').classList.remove('show');
+}
+
+async function processFile(file){
+  resetUploadUI();
+  const isExcel=/\.xlsx?$/i.test(file.name);
+  if(isExcel){
+    if(typeof XLSX==='undefined'){showUploadError('Excel support needs an internet connection (one-time library load). CSV and .txt files always work offline.');return;}
+    try{
+      const buf=await file.arrayBuffer();
+      loadWorkbookFromArrayBuffer(buf);
+    }catch{showUploadError('Could not read this Excel file. Make sure it\'s a valid .xlsx or .xls file.');}
+  }else{
+    const text=await file.text();
+    loadCSVText(text);
+  }
+}
+
+// ── SHARED: rows → column picker or direct extraction ────────────
+function loadCSVText(text){
+  const rows=parseCSV(text);
+  if(!rows.length){showUploadError('File appears empty.');return;}
+  if(rows[0].length>1){
+    showColumnPicker(rows);
+  }else{
+    extractEmailsFromText(text);
+  }
+}
+
+function loadWorkbookFromArrayBuffer(buf){
+  let rows;
+  try{
+    const wb=XLSX.read(buf,{type:'array'});
+    const ws=wb.Sheets[wb.SheetNames[0]];
+    rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:''}).map(r=>r.map(c=>String(c??'').trim())).filter(r=>r.some(c=>c));
+  }catch{showUploadError('Could not read this spreadsheet. Make sure it\'s a valid Excel file.');return;}
+  if(!rows.length){showUploadError('Sheet appears empty.');return;}
+  if(rows[0].length>1){
+    showColumnPicker(rows);
+  }else{
+    const allFound=[...new Set(rows.flat().filter(v=>v&&EMAIL_RE.test(v)))];
+    finishExtraction(allFound);
+  }
+}
+
+function extractEmailsFromText(text){
+  const emailRe=/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g;
+  const allFound=[...new Set(text.match(emailRe)||[])];
+  finishExtraction(allFound);
+}
+
+function finishExtraction(allFound){
+  const emails=allFound.slice(0,BULK_LIMIT);
+  if(!emails.length){showUploadError('No emails found. Make sure your file has an email column.');return;}
+  runUploadValidation(emails,allFound.length);
+}
+
+function showColumnPicker(rows){
+  _parsedCSVRows=rows;
+  const headers=rows[0];
+  const scores=headers.map((_,i)=>scoreColumnForEmails(rows,i));
+  const bestIdx=scores.indexOf(Math.max(...scores));
+  _selectedColIndex=bestIdx;
+
+  const grid=document.getElementById('colGrid');
+  grid.innerHTML=headers.map((h,i)=>{
+    const sample=rows.slice(1,4).map(r=>r[i]||'').filter(Boolean).join(', ');
+    const isEmail=scores[i]>0.5;
+    return `<label class="col-option${i===bestIdx?' selected':''}" onclick="selectCol(${i},this)">
+      <input type="radio" name="colPick" value="${i}"${i===bestIdx?' checked':''}>
+      <div>
+        <div class="col-name"><span class="col-name-text">${h||'Column '+(i+1)}</span>${isEmail?'<span class="col-email-badge">✉ emails</span>':''}</div>
+        <div class="col-preview">${sample||'(empty)'}</div>
+      </div>
+    </label>`;
+  }).join('');
+  document.getElementById('colPicker').classList.add('show');
+}
+
+function selectCol(idx,label){
+  _selectedColIndex=idx;
+  document.querySelectorAll('.col-option').forEach(el=>el.classList.remove('selected'));
+  label.classList.add('selected');
+}
+
+function confirmColumn(){
+  if(_selectedColIndex===null||!_parsedCSVRows.length)return;
+  const allFound=[...new Set(
+    _parsedCSVRows.slice(1)
+      .map(r=>r[_selectedColIndex]?.trim())
+      .filter(v=>v&&EMAIL_RE.test(v))
+  )];
+  document.getElementById('colPicker').classList.remove('show');
+  if(!allFound.length){showUploadError('No valid emails found in that column.');return;}
+  finishExtraction(allFound);
+}
+
+function showUploadError(msg){
+  const c=document.getElementById('uploadResults');
+  c.style.display='block';
+  c.innerHTML=`<p style="color:var(--red);padding:0.75rem 0">${msg}</p>`;
+}
+
+// ── SHEET LINK (Google Sheets / Dropbox / direct CSV-XLSX URL) ───
+function convertSheetLink(raw){
+  const url=raw.trim();
+  const gs=url.match(/docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  if(gs){
+    const id=gs[1];
+    const gidMatch=url.match(/[#&?]gid=([0-9]+)/);
+    const gid=gidMatch?gidMatch[1]:'0';
+    return{fetchUrl:`https://docs.google.com/spreadsheets/d/${id}/export?format=csv&gid=${gid}`,type:'csv'};
+  }
+  if(/dropbox\.com/.test(url)){
+    let direct=url.replace(/^https?:\/\/(www\.)?dropbox\.com/,'https://dl.dropboxusercontent.com').split('#')[0];
+    direct=direct.replace(/([?&])dl=0\b/,'$1dl=1');
+    const isXlsx=/\.xlsx?(\?|$)/i.test(url);
+    return{fetchUrl:direct,type:isXlsx?'xlsx':'csv'};
+  }
+  const isXlsx=/\.xlsx?(\?|$)/i.test(url);
+  return{fetchUrl:url,type:isXlsx?'xlsx':'csv'};
+}
+
+function showLinkError(msg){
+  const el=document.getElementById('sheetLinkError');
+  el.innerHTML=`<strong>⚠️ Couldn't fetch that link</strong><div class="dup-list">${msg}</div>`;
+  el.classList.add('show');
+}
+
+async function processSheetLink(){
+  const input=document.getElementById('sheetLinkInput');
+  const raw=input.value.trim();
+  if(!raw){input.focus();return;}
+  resetUploadUI();
+  const btn=document.getElementById('sheetLinkBtn');
+  const orig=btn.innerHTML;
+  btn.innerHTML='<span class="spinner"></span> Fetching...';btn.disabled=true;
+  try{
+    const{fetchUrl,type}=convertSheetLink(raw);
+    if(type==='xlsx'&&typeof XLSX==='undefined'){
+      showLinkError('Excel support needs an internet connection (one-time library load). Try a Google Sheets link or a .csv link instead.');
+      return;
+    }
+    const resp=await fetch(fetchUrl,{redirect:'follow'});
+    if(!resp.ok)throw new Error('http-'+resp.status);
+    if(type==='xlsx'){
+      const buf=await resp.arrayBuffer();
+      loadWorkbookFromArrayBuffer(buf);
+    }else{
+      const text=await resp.text();
+      const trimmed=text.trim().toLowerCase();
+      if(trimmed.startsWith('<!doctype')||trimmed.startsWith('<html'))throw new Error('not-public');
+      loadCSVText(text);
+    }
+  }catch(err){
+    showLinkError('Make sure the sheet is shared as "Anyone with the link can view," then try again. If it still fails, download the file and use the upload box above instead.');
+  }finally{
+    btn.innerHTML=orig;btn.disabled=false;
+  }
+}
+
+async function runUploadValidation(emails,totalFound){
+  const container=document.getElementById('uploadResults');
+  container.style.display='block';
+  const truncated=totalFound&&totalFound>emails.length;
+  container.innerHTML=truncated
+    ?`<p style="color:var(--yellow);padding:0.75rem 0;font-weight:600">Found ${totalFound} emails — validating the first ${emails.length} (max per run). Re-run with the rest in a separate file.</p>`
+    :`<p style="color:var(--blue-bright);padding:0.75rem 0;font-weight:600">Found ${emails.length} emails. Validating...</p>`;
+  showProgress('uploadProgress','uploadProgressFill','uploadProgressLabel',0,emails.length);
+  let results;
+  if(serverOnline){
+    try{
+      const resp=await fetch(`${API}/validate-bulk`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({emails})});
+      const data=await resp.json();results=data.results;
+      showProgress('uploadProgress','uploadProgressFill','uploadProgressLabel',emails.length,emails.length);
+    }catch{results=emails.map(clientValidate);}
+  }else{
+    results=[];
+    for(let i=0;i<emails.length;i++){
+      results.push(clientValidate(emails[i]));
+      if(i%10===0)showProgress('uploadProgress','uploadProgressFill','uploadProgressLabel',i,emails.length);
+      await new Promise(r=>setTimeout(r,5));
+    }
+  }
+  document.getElementById('uploadProgress').style.display='none';
+  renderBulkResults(results,'uploadResults');
+}
+
+// ── MOBILE NAV ────────────────────────────────────────────────────
+function toggleMobileNav(){
+  const nav=document.getElementById('mobileNav');
+  const btn=document.getElementById('hamburger');
+  const open=nav.classList.toggle('open');
+  btn.classList.toggle('open',open);
+  document.body.style.overflow=open?'hidden':'';
+}
+function closeMobileNav(){
+  document.getElementById('mobileNav').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+  document.body.style.overflow='';
+}
+window.addEventListener('resize',()=>{if(window.innerWidth>560)closeMobileNav();});
+
+// ── EXPORT ────────────────────────────────────────────────────────
+function exportCSV(results){
+  const rows=[['Email','Status','Score','SMTP Result','SMTP Detail','MX Records','Notes'],...results.map(r=>[r.email,r.status,r.score,r.smtpResult||'',r.smtpDetail||'',(r.mxRecords||[]).join(';'),r.reasons.map(x=>x.label).join('; ')])];
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([csv],{type:'text/csv'})),download:'pingbox-results.csv'});
+  a.click();
+}
+</script>
+</body>
+</html>
