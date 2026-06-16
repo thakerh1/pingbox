@@ -330,8 +330,54 @@
     .col-option>div{flex:1;min-width:0}
     .col-name{font-size:0.82rem;font-weight:600;color:var(--text);margin-bottom:0.1rem;display:flex;align-items:center;gap:0.35rem;min-width:0}
     .col-name-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+
+    /* ── FIELD MAPPER (column picker v2 — multi-field) ── */
+    .field-map-grid{display:grid;gap:0.6rem;margin-bottom:1rem}
+    .field-map-row{display:grid;grid-template-columns:110px 1fr;align-items:center;gap:0.75rem}
+    .field-map-row label{font-size:0.8rem;font-weight:600;color:var(--text-muted2)}
+    .field-map-row select{padding:0.5rem 0.65rem;background:var(--bg-input);border:1.5px solid var(--border-light);border-radius:8px;color:var(--text);font-size:0.85rem;font-family:'Inter',sans-serif;outline:none;width:100%}
+    .field-map-row select:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-glow)}
+    .field-map-hint{font-size:0.72rem;color:var(--text-muted);margin-top:-0.3rem;margin-bottom:0.85rem}
+
+    /* ── SUGGESTIONS ── */
+    .suggestion-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+    .suggestion-item{display:flex;flex-direction:column;gap:0.3rem;padding:0.5rem 0.6rem;background:var(--bg-mid);border:1px solid var(--border);border-radius:8px;margin-bottom:0.4rem;min-width:200px}
+    .suggestion-item:last-child{margin-bottom:0}
+    .suggestion-email-row{display:flex;align-items:center;gap:0.35rem}
+    .suggestion-email-full{font-size:0.78rem;color:var(--text);font-weight:600;word-break:break-all}
+    .suggestion-meta-row{font-size:0.68rem;color:var(--text-muted)}
+    .suggestion-actions{display:flex;gap:0.4rem;margin-top:0.15rem}
+    .suggestion-approve,.suggestion-discard{border-radius:6px;padding:0.25rem 0.6rem;font-size:0.72rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;border:1px solid}
+    .suggestion-approve{background:var(--green-bg);color:var(--green);border-color:var(--green-border)}
+    .suggestion-approve:hover{background:var(--green);color:#fff}
+    .suggestion-discard{background:var(--red-bg);color:var(--red);border-color:var(--red-border)}
+    .suggestion-discard:hover{background:var(--red);color:#fff}
+    .suggestion-approve:disabled,.suggestion-discard:disabled{opacity:0.6;cursor:not-allowed}
+    .single-suggestions{margin-top:0.75rem;display:none}
+    .single-suggestions.show{display:block}
+    .single-suggestion-row{display:flex;align-items:center;justify-content:space-between;gap:0.6rem;padding:0.5rem 0;border-top:1px solid var(--border)}
+    .single-suggestion-row:first-of-type{border-top:none}
+    .single-suggestion-email{color:var(--blue-bright);font-size:0.85rem;font-weight:600}
+    .single-suggestion-meta{font-size:0.7rem;color:var(--text-muted);margin-top:0.15rem}
     .col-preview{font-size:0.72rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .col-email-badge{font-size:0.65rem;font-weight:700;background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);padding:0.1rem 0.4rem;border-radius:4px;flex-shrink:0}
+
+    /* ── SCAN CARD ── */
+    .btn-primary.full{width:100%;justify-content:center}
+    .scan-cards{display:flex;flex-direction:column;gap:0.75rem;margin-top:1rem}
+    .scan-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.1rem}
+    .scan-card-top{display:flex;align-items:center;justify-content:space-between;gap:0.5rem;margin-bottom:0.75rem}
+    .scan-card-filename{font-size:0.78rem;font-weight:600;color:var(--text-muted2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .scan-card-remove{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.95rem;padding:0.1rem 0.3rem;border-radius:4px;flex-shrink:0}
+    .scan-card-remove:hover{color:var(--red);background:var(--red-bg)}
+    .scan-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.6rem}
+    @media(max-width:600px){.scan-card-grid{grid-template-columns:1fr}}
+    .scan-card-field{display:flex;flex-direction:column;gap:0.25rem}
+    .scan-card-field label{font-size:0.68rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em}
+    .scan-card-field input{padding:0.45rem 0.6rem;background:var(--bg-input);border:1.5px solid var(--border-light);border-radius:7px;color:var(--text);font-size:0.83rem;font-family:'Inter',sans-serif;outline:none}
+    .scan-card-field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-glow)}
+    .scan-card-field.email-field{grid-column:1 / -1}
+    .scan-card-no-text{font-size:0.78rem;color:var(--yellow);background:var(--yellow-bg);border:1px solid var(--yellow-border);border-radius:7px;padding:0.5rem 0.7rem;margin-bottom:0.6rem}
 
     /* ── HAMBURGER ── */
     .hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;background:none;border:1px solid var(--border);border-radius:8px;cursor:pointer;padding:0 8px;flex-shrink:0}
@@ -466,13 +512,8 @@
     </div>
     <div class="stat-div"></div>
     <div class="hero-stat">
-      <div class="hero-stat-num">100%</div>
-      <div class="hero-stat-lbl">Free, always</div>
-    </div>
-    <div class="stat-div"></div>
-    <div class="hero-stat">
-      <div class="hero-stat-num">1,000</div>
-      <div class="hero-stat-lbl">Emails per bulk run</div>
+      <div class="hero-stat-num">500</div>
+      <div class="hero-stat-lbl">Free emails per run</div>
     </div>
   </div>
 </div>
@@ -492,7 +533,8 @@
       <div class="tabs">
         <button class="tab active" onclick="switchTab('single',this)">Single Email</button>
         <button class="tab" onclick="switchTab('bulk',this)">Bulk Paste</button>
-        <button class="tab" onclick="switchTab('upload',this)">Upload CSV</button>
+        <button class="tab" onclick="switchTab('upload',this)">Upload CSV/Paste Link</button>
+        <button class="tab" onclick="switchTab('scan',this)">Scan Card</button>
       </div>
 
       <!-- SINGLE -->
@@ -517,6 +559,7 @@
           <div class="checks-grid" id="resChecks"></div>
           <div class="mx-block" id="resMX" style="display:none"></div>
           <div class="smtp-block" id="resSMTP"></div>
+          <div class="single-suggestions" id="resSuggestions"></div>
         </div>
       </div>
 
@@ -531,7 +574,7 @@ test@fakeemail..."></textarea>
           <strong>⚠️ Duplicates found</strong> — <span id="dupCount"></span> emails appear more than once and will be removed before validating.
           <div class="dup-list" id="dupList"></div>
         </div>
-        <p class="textarea-hint">Up to 1,000 emails. Duplicates removed automatically.</p>
+        <p class="textarea-hint">Up to 500 emails. Duplicates removed automatically.</p>
         <div class="bulk-actions">
           <button class="btn-primary" id="bulkBtn" onclick="validateBulk()">Validate All</button>
           <button class="btn-ghost" onclick="clearBulk()">Clear</button>
@@ -551,7 +594,7 @@ test@fakeemail..."></textarea>
           <div class="drop-icon">📂</div>
           <h3>Drop your CSV or Excel file here</h3>
           <p>or click to browse. Email column detected automatically.</p>
-          <p style="margin-top:0.5rem;font-size:0.75rem;color:var(--text-muted)">Supports .csv, .txt, .xlsx, .xls · Validates up to 1,000 emails per run</p>
+          <p style="margin-top:0.5rem;font-size:0.75rem;color:var(--text-muted)">Supports .csv, .txt, .xlsx, .xls · Validates up to 500 emails per run</p>
         </div>
         <input type="file" class="file-input-hidden" id="csvFile" accept=".csv,.txt,.xlsx,.xls" onchange="handleFileSelect(event)" />
 
@@ -565,16 +608,39 @@ test@fakeemail..."></textarea>
         <div class="dup-warning link-error" id="sheetLinkError"></div>
 
         <div class="col-picker" id="colPicker">
-          <h4>Which column has the email addresses?</h4>
-          <p>We found multiple columns — pick the right one and we'll extract emails from it.</p>
-          <div class="col-grid" id="colGrid"></div>
-          <button class="btn-primary" onclick="confirmColumn()">Validate Selected Column</button>
+          <h4>Map your columns</h4>
+          <p class="field-map-hint">We auto-detected likely matches — confirm or adjust. Email is required; the rest are optional and power smarter suggestions for invalid emails (typo fixes, constructed guesses, and addresses found on the company site).</p>
+          <div class="field-map-grid" id="fieldMapGrid"></div>
+          <button class="btn-primary" onclick="confirmColumn()">Validate This File</button>
         </div>
         <div class="progress-wrap" id="uploadProgress">
           <div class="progress-bar-bg"><div class="progress-bar-fill" id="uploadProgressFill"></div></div>
           <div class="progress-label" id="uploadProgressLabel">Validating...</div>
         </div>
         <div class="results-section" id="uploadResults"></div>
+      </div>
+
+      <!-- SCAN CARD -->
+      <div class="panel" id="panel-scan">
+        <div class="drop-zone" id="imageDropZone"
+          onclick="document.getElementById('imageFile').click()"
+          ondragover="handleImageDragOver(event)" ondragleave="handleImageDragLeave()" ondrop="handleImageDrop(event)">
+          <div class="drop-icon">🪪</div>
+          <h3>Drop business card photos here</h3>
+          <p>or click to browse — upload several at once. We'll pull out names, emails, companies, and websites automatically.</p>
+          <p style="margin-top:0.5rem;font-size:0.75rem;color:var(--text-muted)">Supports .jpg, .png, .webp · Up to 10 images per batch · Needs the local server running (OCR happens there, on your machine)</p>
+        </div>
+        <input type="file" class="file-input-hidden" id="imageFile" accept="image/*" multiple onchange="handleImageFileSelect(event)" />
+
+        <div class="progress-wrap" id="scanProgress">
+          <div class="progress-bar-bg"><div class="progress-bar-fill" id="scanProgressFill"></div></div>
+          <div class="progress-label" id="scanProgressLabel">Scanning images...</div>
+        </div>
+
+        <div class="scan-cards" id="scanCards"></div>
+        <button class="btn-primary full" id="scanValidateBtn" style="display:none;margin-top:1rem" onclick="runScanValidation()">Validate All</button>
+
+        <div class="results-section" id="scanResults"></div>
       </div>
     </div>
   </div>
@@ -655,12 +721,12 @@ test@fakeemail..."></textarea>
         <div class="about-stat-lbl">Data sent to any external server</div>
       </div>
       <div class="about-stat">
-        <div class="about-stat-num">1,000</div>
-        <div class="about-stat-lbl">Emails per bulk run</div>
+        <div class="about-stat-num">500</div>
+        <div class="about-stat-lbl">Free emails per run</div>
       </div>
       <div class="about-stat">
-        <div class="about-stat-num">Free</div>
-        <div class="about-stat-lbl">Forever. No hidden tiers.</div>
+        <div class="about-stat-num">No card</div>
+        <div class="about-stat-lbl">Needed to get started</div>
       </div>
     </div>
   </div>
@@ -683,7 +749,7 @@ test@fakeemail..."></textarea>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script>
 const API='http://127.0.0.1:3456';
-const BULK_LIMIT=1000; // matches server.js cap — keep these in sync
+const BULK_LIMIT=500; // matches server.js cap — keep these in sync
 let serverOnline=false;
 
 // ── THEME ────────────────────────────────────────────────────────
@@ -758,7 +824,7 @@ const ROLE=['info','support','admin','help','contact','sales','no-reply','norepl
 const FREE=new Set(['gmail.com','yahoo.com','hotmail.com','outlook.com','icloud.com','aol.com','mail.com','protonmail.com','live.com','msn.com','me.com','mac.com']);
 
 function clientValidate(email){
-  const r={email,status:'valid',score:100,mxRecords:[],smtpResult:null,smtpDetail:null,reasons:[]};
+  const r={email,status:'valid',score:100,mxRecords:[],smtpResult:null,smtpDetail:null,reasons:[],suggestions:[]};
   const t=email.trim().toLowerCase();
   const re=/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
   if(!re.test(t)||t.includes('..')){return{...r,status:'invalid',score:0,reasons:[{label:'Invalid syntax',type:'red'}]};}
@@ -869,6 +935,30 @@ function renderSingleResult(r){
     const sc={valid:'var(--green)',invalid:'var(--red)',unknown:'var(--yellow)'}[r.smtpResult]||'var(--text-muted)';
     smtpEl.innerHTML=`<strong>SMTP:</strong> <span style="color:${sc}">${r.smtpDetail}</span>`;
   }else smtpEl.style.display='none';
+
+  const sugEl=document.getElementById('resSuggestions');
+  if(r.suggestions&&r.suggestions.length){
+    sugEl.classList.add('show');
+    sugEl.innerHTML=`<strong style="font-size:0.85rem">💡 Suggested alternatives</strong>${r.suggestions.map((s,i)=>`
+      <div class="single-suggestion-row">
+        <div>
+          <div class="single-suggestion-email">${s.email}</div>
+          <div class="single-suggestion-meta">${SUGGESTION_SOURCE_LABEL[s.source]||s.source} · <span style="color:${SUGGESTION_CONFIDENCE_COLOR[s.confidence]||'var(--text-muted)'}">${s.confidence} confidence</span></div>
+        </div>
+        <button class="typo-apply" data-suggestion-idx="${i}">Use this</button>
+      </div>`).join('')}`;
+    sugEl.querySelectorAll('[data-suggestion-idx]').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const suggestion=r.suggestions[parseInt(btn.dataset.suggestionIdx,10)];
+        document.getElementById('singleInput').value=suggestion.email;
+        clearSingleResult();
+        checkTypo();
+      });
+    });
+  }else{
+    sugEl.classList.remove('show');
+    sugEl.innerHTML='';
+  }
 }
 function clearSingleResult(){
   document.getElementById('singleResult').style.display='none';
@@ -1001,17 +1091,17 @@ function smartNote(r){
   const has=s=>labels.some(l=>l.toLowerCase().includes(s));
 
   if(r.status==='invalid'){
-    if(has('invalid syntax'))return{summary:'Malformed address',action:'Fix or remove',cls:'invalid'};
-    if(has('disposable'))   return{summary:'Throwaway inbox',action:'Remove from list',cls:'invalid'};
-    if(has('domain does'))  return{summary:'Domain not found',action:'Remove from list',cls:'invalid'};
-    if(has('no mx'))        return{summary:'No mail server',action:'Remove from list',cls:'invalid'};
+    if(has('invalid syntax'))  return{summary:'Malformed address',action:'Fix or remove',cls:'invalid'};
+    if(has('disposable inbox'))return{summary:'Throwaway inbox',action:'Remove from list',cls:'invalid'};
+    if(has('domain does'))     return{summary:'Domain not found',action:'Remove from list',cls:'invalid'};
+    if(has('no mx'))           return{summary:'No mail server',action:'Remove from list',cls:'invalid'};
     if(has('mailbox rej')||has('smtp'))return{summary:'Mailbox rejected',action:'Remove from list',cls:'invalid'};
     return{summary:'Cannot receive mail',action:'Remove from list',cls:'invalid'};
   }
   if(r.status==='risky'){
-    if(has('role'))         return{summary:'Shared team inbox',action:'Find direct contact',cls:'risky'};
-    if(has('disposable'))   return{summary:'Throwaway inbox',action:'Use with caution',cls:'risky'};
-    if(has('free provider'))return{summary:'Personal address',action:'OK for B2C campaigns',cls:'risky'};
+    if(has('role'))            return{summary:'Shared team inbox',action:'Find direct contact',cls:'risky'};
+    if(has('disposable inbox'))return{summary:'Throwaway inbox',action:'Use with caution',cls:'risky'};
+    if(has('free provider'))   return{summary:'Personal address',action:'OK for B2C campaigns',cls:'risky'};
     return{summary:'Deliverable with caveats',action:'Review before sending',cls:'risky'};
   }
   // valid
@@ -1025,6 +1115,39 @@ const STATUS_TIPS={
   risky:`<strong>⚠️ Risky</strong>Address is real but has flags — shared inbox, free provider, or inconclusive SMTP.<span class="tip-box-action risky">→ Review before sending</span>`,
   invalid:`<strong>❌ Invalid</strong>This address doesn't exist, has no mail server, or was rejected by SMTP.<span class="tip-box-action invalid">→ Remove from your list</span>`
 };
+
+// ── SUGGESTIONS (typo / constructed / scraped — from the server) ──
+const SUGGESTION_CONFIDENCE_COLOR={high:'var(--green)',medium:'var(--yellow)',low:'var(--text-muted)'};
+const SUGGESTION_SOURCE_ICON={typo:'✏️',constructed:'🛠️',scraped:'🔍'};
+const SUGGESTION_SOURCE_LABEL={typo:'Typo fix',constructed:'Constructed from name',scraped:'Found on company site'};
+
+function renderSuggestionCell(rowIdx,suggestions){
+  if(!suggestions||!suggestions.length)return '<span style="color:var(--text-muted);font-size:0.75rem">—</span>';
+  return suggestions.map((s,sugIdx)=>`<div class="suggestion-item">
+    <div class="suggestion-email-row">
+      <span>${SUGGESTION_SOURCE_ICON[s.source]||'💡'}</span>
+      <span class="suggestion-email-full">${s.email}</span>
+      <span class="suggestion-dot" style="background:${SUGGESTION_CONFIDENCE_COLOR[s.confidence]||'var(--text-muted)'}"></span>
+    </div>
+    <div class="suggestion-meta-row">${SUGGESTION_SOURCE_LABEL[s.source]||s.source} · ${s.confidence} confidence</div>
+    <div class="suggestion-actions">
+      <button class="suggestion-approve" data-approve data-row-idx="${rowIdx}" data-sug-idx="${sugIdx}">✓ Approve</button>
+      <button class="suggestion-discard" data-discard data-row-idx="${rowIdx}" data-sug-idx="${sugIdx}">✕ Discard</button>
+    </div>
+  </div>`).join('');
+}
+
+// Re-runs validation for a single corrected email (used when a suggestion
+// is approved) — same logic the Single Email tab uses.
+async function revalidateEmail(email){
+  if(serverOnline){
+    try{
+      const resp=await fetch(`${API}/validate?email=${encodeURIComponent(email)}`);
+      if(resp.ok)return await resp.json();
+    }catch{}
+  }
+  return clientValidate(email);
+}
 
 // ── RESULTS RENDERER ─────────────────────────────────────────────
 function renderBulkResults(results,id){
@@ -1044,8 +1167,8 @@ function renderBulkResults(results,id){
     </div>
     <div class="table-wrap">
       <table class="results-table">
-        <thead><tr><th>Email</th><th>Status</th><th>Score</th><th>What to do</th></tr></thead>
-        <tbody>${results.map(r=>{
+        <thead><tr><th>Email</th><th>Status</th><th>Score</th><th>What to do</th><th>Suggestions</th></tr></thead>
+        <tbody>${results.map((r,rowIdx)=>{
           const note=smartNote(r);
           const scoreColor=r.score>=75?'var(--green)':r.score>=40?'var(--yellow)':'var(--red)';
           return`<tr>
@@ -1053,6 +1176,7 @@ function renderBulkResults(results,id){
             <td><span class="badge ${r.status} has-tip">${r.status.charAt(0).toUpperCase()+r.status.slice(1)}<span class="tip-box">${STATUS_TIPS[r.status]||''}</span></span></td>
             <td style="font-weight:700;color:${scoreColor}">${r.score}/100</td>
             <td><div class="note-cell"><span class="note-summary">${note.summary}</span><span class="note-action ${note.cls}">${note.action}</span></div></td>
+            <td>${renderSuggestionCell(rowIdx,r.suggestions)}</td>
           </tr>`;
         }).join('')}</tbody>
       </table>
@@ -1065,11 +1189,38 @@ function renderBulkResults(results,id){
       <button class="export-btn" id="copyValidBtn" onclick='copyValidEmails(${JSON.stringify(valid)})'>📋 Copy Valid Emails</button>
     </div>`;
   renderHealthScore(results,container);
+
+  // Approve: replace this row's email with the suggested one, re-validate
+  // it for real, then re-render everything so counts/health/exports stay
+  // in sync with the edited data.
+  container.querySelectorAll('[data-approve]').forEach(btn=>{
+    btn.addEventListener('click',async()=>{
+      const rowIdx=parseInt(btn.dataset.rowIdx,10);
+      const sugIdx=parseInt(btn.dataset.sugIdx,10);
+      const suggestion=results[rowIdx]&&results[rowIdx].suggestions&&results[rowIdx].suggestions[sugIdx];
+      if(!suggestion)return;
+      btn.disabled=true;btn.textContent='Applying...';
+      const newResult=await revalidateEmail(suggestion.email);
+      results[rowIdx]=newResult;
+      renderBulkResults(results,id);
+    });
+  });
+
+  // Discard: just drop that one suggestion, leave the row untouched.
+  container.querySelectorAll('[data-discard]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const rowIdx=parseInt(btn.dataset.rowIdx,10);
+      const sugIdx=parseInt(btn.dataset.sugIdx,10);
+      if(!results[rowIdx]||!results[rowIdx].suggestions)return;
+      results[rowIdx].suggestions.splice(sugIdx,1);
+      renderBulkResults(results,id);
+    });
+  });
 }
 
 // ── FEATURE 5: COLUMN PICKER FOR CSV ─────────────────────────────
 let _parsedCSVRows=[];
-let _selectedColIndex=null;
+let _uploadHeaders=null;
 
 function parseCSV(text){
   const lines=text.split(/\r?\n/).filter(l=>l.trim());
@@ -1160,44 +1311,114 @@ function finishExtraction(allFound){
   runUploadValidation(emails,allFound.length);
 }
 
+// ── Multi-field column mapping (email + optional firstName/lastName/
+// fullName/company/website — the enrichment fields that power typo
+// correction, constructed guesses, and scraped suggestions server-side) ──
+const FIELD_SYNONYMS={
+  email:['email','emailaddress','email address','e-mail','mail','emailid'],
+  firstName:['firstname','first name','fname','first','givenname'],
+  lastName:['lastname','last name','lname','last','surname','familyname'],
+  fullName:['fullname','full name','name','contactname','contact name'],
+  company:['company','companyname','company name','organisation','organization','org','business','employer'],
+  website:['website','web','url','site','domain','companywebsite','webaddress']
+};
+function normalizeHeader(h){return String(h||'').toLowerCase().replace(/[^a-z]/g,'');}
+
+function detectColumnMapFull(headers){
+  const map={email:null,firstName:null,lastName:null,fullName:null,company:null,website:null};
+  const used=new Set();
+  for(const field of Object.keys(FIELD_SYNONYMS)){
+    const syns=new Set(FIELD_SYNONYMS[field].map(normalizeHeader));
+    for(let i=0;i<headers.length;i++){
+      if(used.has(i))continue;
+      if(syns.has(normalizeHeader(headers[i]))){map[field]=i;used.add(i);break;}
+    }
+  }
+  for(const field of Object.keys(FIELD_SYNONYMS)){
+    if(map[field]!==null)continue;
+    const syns=FIELD_SYNONYMS[field].map(normalizeHeader);
+    let bestIdx=-1,bestDist=Infinity;
+    for(let i=0;i<headers.length;i++){
+      if(used.has(i))continue;
+      const h=normalizeHeader(headers[i]);
+      if(!h)continue;
+      for(const syn of syns){
+        if(h.includes(syn)||syn.includes(h)){bestDist=0;bestIdx=i;break;}
+        const dist=levenshtein(h,syn);
+        if(dist<bestDist&&dist<=2){bestDist=dist;bestIdx=i;}
+      }
+      if(bestDist===0)break;
+    }
+    if(bestIdx!==-1){map[field]=bestIdx;used.add(bestIdx);}
+  }
+  // Header names didn't point at an email column? Fall back to scanning
+  // actual cell values for email-shaped strings (handles odd/blank headers).
+  if(map.email===null){
+    const scores=headers.map((_,i)=>scoreColumnForEmails(rowsForScoring,i));
+    const bestIdx=scores.indexOf(Math.max(...scores));
+    if(scores[bestIdx]>0.3)map.email=bestIdx;
+  }
+  return map;
+}
+let rowsForScoring=[]; // set by showColumnPicker right before detectColumnMapFull needs it
+
 function showColumnPicker(rows){
   _parsedCSVRows=rows;
+  rowsForScoring=rows;
   const headers=rows[0];
-  const scores=headers.map((_,i)=>scoreColumnForEmails(rows,i));
-  const bestIdx=scores.indexOf(Math.max(...scores));
-  _selectedColIndex=bestIdx;
+  const colMap=detectColumnMapFull(headers);
 
-  const grid=document.getElementById('colGrid');
-  grid.innerHTML=headers.map((h,i)=>{
-    const sample=rows.slice(1,4).map(r=>r[i]||'').filter(Boolean).join(', ');
-    const isEmail=scores[i]>0.5;
-    return `<label class="col-option${i===bestIdx?' selected':''}" onclick="selectCol(${i},this)">
-      <input type="radio" name="colPick" value="${i}"${i===bestIdx?' checked':''}>
-      <div>
-        <div class="col-name"><span class="col-name-text">${h||'Column '+(i+1)}</span>${isEmail?'<span class="col-email-badge">✉ emails</span>':''}</div>
-        <div class="col-preview">${sample||'(empty)'}</div>
-      </div>
-    </label>`;
+  const fields=[
+    {key:'email',label:'Email *'},
+    {key:'firstName',label:'First Name'},
+    {key:'lastName',label:'Last Name'},
+    {key:'fullName',label:'Full Name'},
+    {key:'company',label:'Company'},
+    {key:'website',label:'Website'}
+  ];
+  const grid=document.getElementById('fieldMapGrid');
+  grid.innerHTML=fields.map(f=>{
+    const options=['<option value="">— none —</option>'].concat(
+      headers.map((h,i)=>`<option value="${i}"${colMap[f.key]===i?' selected':''}>${h||'Column '+(i+1)}</option>`)
+    );
+    return `<div class="field-map-row">
+      <label>${f.label}</label>
+      <select data-field="${f.key}">${options.join('')}</select>
+    </div>`;
   }).join('');
   document.getElementById('colPicker').classList.add('show');
 }
 
-function selectCol(idx,label){
-  _selectedColIndex=idx;
-  document.querySelectorAll('.col-option').forEach(el=>el.classList.remove('selected'));
-  label.classList.add('selected');
+function confirmColumn(){
+  const selects=document.querySelectorAll('#fieldMapGrid select');
+  const map={};
+  selects.forEach(s=>{map[s.dataset.field]=s.value===''?null:parseInt(s.value,10);});
+  if(map.email===null){showUploadError('Please choose which column has the email addresses.');return;}
+  if(!_parsedCSVRows.length)return;
+
+  _uploadHeaders=_parsedCSVRows[0]; // remembered so the export can restore every original column
+  const get=(row,idx)=>(idx!==null&&idx!==undefined&&row[idx]!==undefined)?String(row[idx]).trim():'';
+  const enrichedRows=_parsedCSVRows.slice(1).map(row=>{
+    let firstName=get(row,map.firstName);
+    let lastName=get(row,map.lastName);
+    const fullName=get(row,map.fullName);
+    if((!firstName||!lastName)&&fullName){
+      const spaceIdx=fullName.indexOf(' ');
+      if(spaceIdx===-1){firstName=firstName||fullName;}
+      else{firstName=firstName||fullName.slice(0,spaceIdx);lastName=lastName||fullName.slice(spaceIdx+1);}
+    }
+    return{email:get(row,map.email),firstName,lastName,company:get(row,map.company),website:get(row,map.website),_raw:row};
+  }).filter(r=>r.email&&EMAIL_RE.test(r.email.toLowerCase()));
+
+  document.getElementById('colPicker').classList.remove('show');
+  if(!enrichedRows.length){showUploadError('No valid emails found in the selected email column.');return;}
+  finishExtractionRows(enrichedRows);
 }
 
-function confirmColumn(){
-  if(_selectedColIndex===null||!_parsedCSVRows.length)return;
-  const allFound=[...new Set(
-    _parsedCSVRows.slice(1)
-      .map(r=>r[_selectedColIndex]?.trim())
-      .filter(v=>v&&EMAIL_RE.test(v))
-  )];
-  document.getElementById('colPicker').classList.remove('show');
-  if(!allFound.length){showUploadError('No valid emails found in that column.');return;}
-  finishExtraction(allFound);
+function finishExtractionRows(allRows){
+  const rows=allRows.slice(0,BULK_LIMIT);
+  if(!rows.length){showUploadError('No emails found.');return;}
+  runUploadValidation(rows,allRows.length);
 }
 
 function showUploadError(msg){
@@ -1264,31 +1485,185 @@ async function processSheetLink(){
   }
 }
 
-async function runUploadValidation(emails,totalFound){
+async function runUploadValidation(items,totalFound){
+  // `items` is either a plain array of email strings (single-column files,
+  // plain-text drops) or an array of enriched { email, firstName, lastName,
+  // company, website } objects from the multi-field column mapper.
+  const isEnriched=items.length>0&&typeof items[0]==='object';
+  const emailsOnly=isEnriched?items.map(r=>r.email):items;
+
   const container=document.getElementById('uploadResults');
   container.style.display='block';
-  const truncated=totalFound&&totalFound>emails.length;
+  const truncated=totalFound&&totalFound>items.length;
   container.innerHTML=truncated
-    ?`<p style="color:var(--yellow);padding:0.75rem 0;font-weight:600">Found ${totalFound} emails — validating the first ${emails.length} (max per run). Re-run with the rest in a separate file.</p>`
-    :`<p style="color:var(--blue-bright);padding:0.75rem 0;font-weight:600">Found ${emails.length} emails. Validating...</p>`;
-  showProgress('uploadProgress','uploadProgressFill','uploadProgressLabel',0,emails.length);
+    ?`<p style="color:var(--yellow);padding:0.75rem 0;font-weight:600">Found ${totalFound} emails — validating the first ${items.length} (max per run). Re-run with the rest in a separate file.</p>`
+    :`<p style="color:var(--blue-bright);padding:0.75rem 0;font-weight:600">Found ${items.length} emails. Validating...</p>`;
+  showProgress('uploadProgress','uploadProgressFill','uploadProgressLabel',0,items.length);
   let results;
   if(serverOnline){
     try{
-      const resp=await fetch(`${API}/validate-bulk`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({emails})});
+      const payload=isEnriched?{rows:items}:{emails:items};
+      const resp=await fetch(`${API}/validate-bulk`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
       const data=await resp.json();results=data.results;
-      showProgress('uploadProgress','uploadProgressFill','uploadProgressLabel',emails.length,emails.length);
-    }catch{results=emails.map(clientValidate);}
+      showProgress('uploadProgress','uploadProgressFill','uploadProgressLabel',items.length,items.length);
+    }catch{results=emailsOnly.map(clientValidate);}
   }else{
     results=[];
-    for(let i=0;i<emails.length;i++){
-      results.push(clientValidate(emails[i]));
-      if(i%10===0)showProgress('uploadProgress','uploadProgressFill','uploadProgressLabel',i,emails.length);
+    for(let i=0;i<emailsOnly.length;i++){
+      results.push(clientValidate(emailsOnly[i]));
+      if(i%10===0)showProgress('uploadProgress','uploadProgressFill','uploadProgressLabel',i,emailsOnly.length);
       await new Promise(r=>setTimeout(r,5));
     }
   }
   document.getElementById('uploadProgress').style.display='none';
+  // Re-attach the original uploaded row (every original column, untouched)
+  // to each result by position, so exports can restore it alongside our
+  // validation columns.
+  if(isEnriched&&_uploadHeaders){
+    results.forEach((r,i)=>{ if(items[i]&&items[i]._raw){r._raw=items[i]._raw;r._rawHeaders=_uploadHeaders;} });
+  }
   renderBulkResults(results,'uploadResults');
+}
+
+// ── SCAN CARD (image upload → OCR → editable contact cards) ─────
+// OCR runs server-side only (no client-side fallback) — there's no
+// browser API for this, so the whole tab is a no-op without the local
+// server running.
+let _scannedCards=[];
+
+function handleImageDragOver(e){e.preventDefault();document.getElementById('imageDropZone').classList.add('drag-over');}
+function handleImageDragLeave(){document.getElementById('imageDropZone').classList.remove('drag-over');}
+function handleImageDrop(e){
+  e.preventDefault();
+  document.getElementById('imageDropZone').classList.remove('drag-over');
+  const files=[...e.dataTransfer.files].filter(f=>f.type.startsWith('image/'));
+  if(files.length)processImageFiles(files);
+}
+function handleImageFileSelect(e){
+  const files=[...e.target.files];
+  if(files.length)processImageFiles(files);
+}
+
+const MAX_SCAN_IMAGES=10;
+
+async function processImageFiles(files){
+  const resultsEl=document.getElementById('scanResults');
+  resultsEl.style.display='none';resultsEl.innerHTML='';
+
+  if(!serverOnline){
+    document.getElementById('scanCards').innerHTML=`<p style="color:var(--red);padding:0.75rem 0">Image scanning needs the local Pingbox server (OCR runs there). Start <code>START-PINGBOX.bat</code>, then refresh this page.</p>`;
+    return;
+  }
+
+  const remainingSlots=MAX_SCAN_IMAGES-_scannedCards.length;
+  if(remainingSlots<=0){
+    document.getElementById('scanCards').insertAdjacentHTML('afterbegin',`<p style="color:var(--yellow);padding:0.5rem 0">You're at the ${MAX_SCAN_IMAGES}-image limit per batch. Remove a card below or click Validate All before adding more.</p>`);
+    return;
+  }
+  const truncated=files.length>remainingSlots;
+  if(truncated)files=files.slice(0,remainingSlots);
+
+  const progress=document.getElementById('scanProgress');
+  progress.style.display='block';
+  document.getElementById('scanProgressFill').style.width='10%';
+  document.getElementById('scanProgressLabel').textContent=`Reading text from ${files.length} image${files.length>1?'s':''}...`;
+
+  try{
+    const formData=new FormData();
+    files.forEach((f,i)=>formData.append('image'+i,f,f.name));
+    const resp=await fetch(`${API}/scan-image`,{method:'POST',body:formData});
+    const data=await resp.json();
+    document.getElementById('scanProgressFill').style.width='100%';
+    if(!resp.ok||!data.results){
+      document.getElementById('scanCards').innerHTML=`<p style="color:var(--red);padding:0.75rem 0">${data.error||'Could not scan these images.'}</p>`;
+    }else{
+      _scannedCards=_scannedCards.concat(data.results);
+      renderScanCards();
+      if(truncated)document.getElementById('scanCards').insertAdjacentHTML('afterbegin',`<p style="color:var(--yellow);padding:0.5rem 0">Only scanned the first ${files.length} — ${MAX_SCAN_IMAGES} images max per batch.</p>`);
+    }
+  }catch{
+    document.getElementById('scanCards').innerHTML=`<p style="color:var(--red);padding:0.75rem 0">Could not reach the server to scan these images.</p>`;
+  }finally{
+    setTimeout(()=>{progress.style.display='none';},400);
+  }
+}
+
+function renderScanCards(){
+  const container=document.getElementById('scanCards');
+  const btn=document.getElementById('scanValidateBtn');
+  if(!_scannedCards.length){container.innerHTML='';btn.style.display='none';return;}
+
+  container.innerHTML=_scannedCards.map((c,i)=>`
+    <div class="scan-card" data-idx="${i}">
+      <div class="scan-card-top">
+        <span class="scan-card-filename">📷 ${c.filename}</span>
+        <button class="scan-card-remove" onclick="removeScanCard(${i})" title="Remove">✕</button>
+      </div>
+      ${c.rawText&&c.rawText.trim()?'':'<div class="scan-card-no-text">No readable text found in this image — fields below are blank, fill them in manually or remove this card.</div>'}
+      <div class="scan-card-grid">
+        <div class="scan-card-field email-field">
+          <label>Email *</label>
+          <input type="email" data-field="email" value="${c.email||''}" placeholder="name@company.com">
+        </div>
+        <div class="scan-card-field">
+          <label>First Name</label>
+          <input type="text" data-field="firstName" value="${c.firstName||''}">
+        </div>
+        <div class="scan-card-field">
+          <label>Last Name</label>
+          <input type="text" data-field="lastName" value="${c.lastName||''}">
+        </div>
+        <div class="scan-card-field">
+          <label>Company</label>
+          <input type="text" data-field="company" value="${c.company||''}">
+        </div>
+        <div class="scan-card-field">
+          <label>Website</label>
+          <input type="text" data-field="website" value="${c.website||''}">
+        </div>
+      </div>
+    </div>`).join('');
+
+  btn.style.display='block';
+}
+
+function removeScanCard(idx){
+  _scannedCards.splice(idx,1);
+  renderScanCards();
+}
+
+async function runScanValidation(){
+  // Read current input values (the user may have corrected the OCR guesses).
+  const cardEls=[...document.querySelectorAll('.scan-card')];
+  const rows=cardEls.map(el=>{
+    const get=field=>el.querySelector(`[data-field="${field}"]`).value.trim();
+    return{email:get('email'),firstName:get('firstName'),lastName:get('lastName'),company:get('company'),website:get('website')};
+  }).filter(r=>r.email&&EMAIL_RE.test(r.email.toLowerCase()));
+
+  if(!rows.length){
+    const resultsEl=document.getElementById('scanResults');
+    resultsEl.style.display='block';
+    resultsEl.innerHTML='<p style="color:var(--red);padding:0.75rem 0">No valid email addresses to validate — check the Email field on each card.</p>';
+    return;
+  }
+
+  const btn=document.getElementById('scanValidateBtn');
+  btn.innerHTML='<span class="spinner"></span> Validating...';btn.disabled=true;
+
+  const resultsEl=document.getElementById('scanResults');
+  resultsEl.style.display='block';
+  resultsEl.innerHTML=`<p style="color:var(--blue-bright);padding:0.75rem 0;font-weight:600">Validating ${rows.length} contact${rows.length>1?'s':''}...</p>`;
+
+  let results;
+  try{
+    const resp=await fetch(`${API}/validate-bulk`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({rows})});
+    const data=await resp.json();results=data.results;
+  }catch{
+    results=rows.map(r=>clientValidate(r.email));
+  }
+
+  btn.innerHTML='Validate All';btn.disabled=false;
+  renderBulkResults(results,'scanResults');
 }
 
 // ── MOBILE NAV ────────────────────────────────────────────────────
@@ -1308,7 +1683,16 @@ window.addEventListener('resize',()=>{if(window.innerWidth>560)closeMobileNav();
 
 // ── EXPORT ────────────────────────────────────────────────────────
 function exportCSV(results){
-  const rows=[['Email','Status','Score','SMTP Result','SMTP Detail','MX Records','Notes'],...results.map(r=>[r.email,r.status,r.score,r.smtpResult||'',r.smtpDetail||'',(r.mxRecords||[]).join(';'),r.reasons.map(x=>x.label).join('; ')])];
+  const fmtSuggestions=r=>(r.suggestions||[]).map(s=>`${s.email} (${s.source}/${s.confidence})`).join('; ');
+  // If these results came from an uploaded file, restore every original
+  // column (exactly as uploaded) ahead of our validation columns.
+  const hasOriginal=results.some(r=>r._rawHeaders);
+  const originalHeaders=hasOriginal?(results.find(r=>r._rawHeaders)._rawHeaders):[];
+  const head=[...originalHeaders,'Email','Status','Score','SMTP Result','SMTP Detail','MX Records','Notes','Suggestions'];
+  const rows=[head,...results.map(r=>{
+    const orig=hasOriginal?originalHeaders.map((_,i)=>(r._raw&&r._raw[i]!==undefined)?r._raw[i]:''):[];
+    return[...orig,r.email,r.status,r.score,r.smtpResult||'',r.smtpDetail||'',(r.mxRecords||[]).join(';'),r.reasons.map(x=>x.label).join('; '),fmtSuggestions(r)];
+  })];
   const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
   const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([csv],{type:'text/csv'})),download:'pingbox-results.csv'});
   a.click();

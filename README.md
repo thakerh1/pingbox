@@ -9,33 +9,107 @@ your email list never leaves your computer.
 | File | What it does |
 |---|---|
 | `index.html` | The app itself — open this in your browser |
-| `server.js` | A small local server that does the real DNS/MX/SMTP checks |
+| `server.js` | The local server: DNS/MX/SMTP checks, scraping-based suggestions, file upload, image scanning |
+| `lib/` | Server modules — typo correction, pattern detection, scraping, company lookup, upload parsing, OCR, card-text parsing |
+| `package.json` | Two dependencies (see below) |
 | `START-PINGBOX.bat` | Double-click to start the server (Windows) |
 
 ## Requirements
 
-- **Node.js** (any recent version, 16+) — that's it. No npm packages, no
-  internet access needed beyond DNS/SMTP lookups for the emails you check.
-  Download it free from **https://nodejs.org** (pick the "LTS" version).
+- **Node.js** (any recent version, 16+). Download it free from
+  **https://nodejs.org** (pick the "LTS" version).
+- Two npm dependencies — the only exceptions to "no dependencies,"
+  both for things Node genuinely can't do on its own:
+  - **`xlsx`**, for reading `.xlsx`/`.xls` files uploaded directly to
+    the server (Excel's binary format can't be parsed natively).
+  - **`tesseract.js`**, for reading text out of business-card photos
+    (OCR). The first time you scan an image, it downloads a small
+    (~5MB) language file once and caches it locally — after that it
+    works fully offline.
+
+  Run `npm install` once after downloading this folder, before starting
+  the server for the first time.
 
 ## How to run it (Windows)
 
 1. **Install Node.js** if you don't already have it — run the installer
    like any normal app, click through, done.
-2. **Double-click `START-PINGBOX.bat`.**
+2. **Open a terminal in this folder and run `npm install`** (one-time
+   setup — downloads the `xlsx` package into a local `node_modules`
+   folder; nothing is sent anywhere).
+3. **Double-click `START-PINGBOX.bat`.**
    - A black console window will open and start the server.
    - Keep that window open while you use Pingbox — closing it stops the
      server (the app still works without it, just with fewer checks —
      see below).
-3. **Open `index.html`** in your browser (double-click it, or right-click
+4. **Open `index.html`** in your browser (double-click it, or right-click
    → Open with → your browser of choice).
-4. Look at the top-right of the page — it should say **"MX + SMTP live"**
+5. Look at the top-right of the page — it should say **"MX + SMTP live"**
    with a green dot. That means the server is connected and you're
    getting full validation (DNS + MX + SMTP).
 
-That's it — paste an email, paste a list, drop a CSV/Excel file, or
-paste a Google Sheets/Dropbox link and go. Each run validates up to
-**1,000 emails**.
+That's it — paste an email, paste a list, drop a CSV/Excel file, scan
+a business card image, or paste a Google Sheets/Dropbox link and go.
+Each run validates up to **500 emails**.
+
+## Suggestions for invalid emails
+
+When an email comes back invalid, the server now tries to find a better
+one automatically, in three ways:
+
+1. **Typo correction** — catches misspelled domains (`gmial.com` →
+   `gmail.com`) and misspelled local parts (`jhon` → `john`, `suport` →
+   `support`), then re-validates the fix before suggesting it.
+2. **Constructed from name + company** — if you give it a first/last
+   name and a company name or website, it scrapes the company's public
+   pages (homepage, `/contact`, `/about`, `/team`) to figure out their
+   email convention (`firstname.lastname@`, `flastname@`, etc.), builds
+   the likely address, and validates it.
+3. **Scraped public emails** — real addresses found directly on the
+   company's site, offered as a last-resort backup.
+
+Each suggestion comes with a **confidence** (high/medium/low, based on
+whether it was actually verified) and a **source** label. This needs a
+name and a company name *or* website per row to do anything beyond typo
+correction — without those it gracefully skips straight to "no
+suggestion available."
+
+This is fully wired into the UI:
+
+- **Single Email** — an invalid result shows up to 3 suggested
+  alternatives below the check, each with a one-click **"Use this"**
+  button that drops it straight into the input.
+- **Bulk Paste / Upload CSV** — the results table gets a **Suggestions**
+  column with clickable chips (click to copy); a colored dot shows
+  confidence at a glance.
+- **Upload CSV / Excel** — when your file has more than one column,
+  you'll see a **column mapper** instead of a simple picker: it
+  auto-detects Email, First Name, Last Name, Full Name, Company, and
+  Website columns by header name (or by scanning cell values if headers
+  are missing/unlabeled), and you confirm or adjust before validating.
+  Map First/Last Name *and* Company or Website to unlock constructed +
+  scraped suggestions for that whole file; a plain list of emails (or a
+  file with only an email column) still gets typo correction.
+
+## Scan Card — extract contacts from business card photos
+
+The **Scan Card** tab reads name/email/company/website straight off a
+photo (or several at once):
+
+1. Drop in one or more images — phone photos of business cards, a
+   screenshot of an email signature, whatever has the info on it.
+2. Each image is OCR'd and parsed into an editable card (First Name,
+   Last Name, Email, Company, Website). OCR + the line-guessing that
+   follows it is best-effort, not perfect — **review and correct
+   anything wrong before validating**, that's exactly why every field
+   is editable rather than locked in automatically.
+3. Click **Validate All** to run every card through the same
+   validation + suggestions pipeline as everywhere else in the app.
+
+This needs the local server (OCR has to run somewhere, and there's no
+browser API for it) — it's clearly labeled if the server isn't running.
+Nothing about the image itself is sent anywhere outside your own
+machine; the OCR model runs locally too.
 
 ## Running without the server
 

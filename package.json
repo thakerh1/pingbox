@@ -1,0 +1,13 @@
+{
+  "name": "pingbox-server",
+  "version": "2.2.0",
+  "description": "Pingbox local validation server — DNS/MX/SMTP checks, scraping-based suggestions, file upload, and business-card image scanning (OCR).",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "tesseract.js": "^7.0.0",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
+  }
+}

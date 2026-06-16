@@ -3,7 +3,14 @@ const dns = require('dns');
 const net = require('net');
 const url = require('url');
 
+const { buildSuggestions } = require('./lib/suggestions');
+const { parseContentTypeBoundary, parseMultipart, parseCSV, parseExcel, detectColumnMap } = require('./lib/upload');
+const { extractTextFromImage } = require('./lib/ocr');
+const { parseCardText } = require('./lib/cardParser');
+
 const PORT = 3456;
+const MAX_UPLOAD_BYTES = 25 * 1024 * 1024; // 25MB guard against runaway uploads
+const MAX_IMAGES_PER_SCAN = 10; // OCR is comparatively slow — cap a single request
 
 // ─── Disposable domains ───────────────────────────────────────────
 const DISPOSABLE_DOMAINS = new Set([
@@ -140,7 +147,8 @@ async function validateEmail(email, doSMTP = true) {
     mxRecords: [],
     smtpResult: null,
     smtpDetail: null,
-    reasons: []
+    reasons: [],
+    suggestions: []
   };
 
   const trimmed = email.trim().toLowerCase();
@@ -227,11 +235,57 @@ async function validateEmail(email, doSMTP = true) {
   }
 
   result.score = Math.max(0, Math.min(100, result.score));
-  if (result.score === 0 || result.status === 'invalid') result.status = 'invalid';
-  else if (result.score < 75 || result.status === 'risky') result.status = 'risky';
-  else result.status = 'valid';
+  // Once an email is confirmed invalid (disposable, no domain, no MX, SMTP
+  // rejection...) nothing should be able to walk that back to "risky" —
+  // only escalate severity from here, never de-escalate it.
+  if (result.status !== 'invalid') {
+    if (result.score === 0) result.status = 'invalid';
+    else if (result.score < 75 || result.status === 'risky') result.status = 'risky';
+    else result.status = 'valid';
+  }
 
   return result;
+}
+
+// ─── Row normalization (feature 8) ─────────────────────────────────
+// Accepts either a plain string ("a@b.com") or an enriched object and
+// always returns { email, firstName, lastName, company, website }.
+function normalizeRow(item) {
+  if (typeof item === 'string') return { email: item, firstName: '', lastName: '', company: '', website: '' };
+  return {
+    email: item.email || '',
+    firstName: item.firstName || '',
+    lastName: item.lastName || '',
+    company: item.company || '',
+    website: item.website || ''
+  };
+}
+
+async function validateRow(row, doSMTP) {
+  const result = await validateEmail(row.email, doSMTP);
+  if (result.status === 'invalid') {
+    try {
+      result.suggestions = await buildSuggestions(result, row, validateEmail);
+    } catch {
+      result.suggestions = []; // a suggestion-pipeline failure must never fail validation itself
+    }
+  }
+  return result;
+}
+
+// ─── HTTP body collection helpers ──────────────────────────────────
+function collectBody(req, maxBytes = 5 * 1024 * 1024) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    let size = 0;
+    req.on('data', chunk => {
+      size += chunk.length;
+      if (size > maxBytes) { req.destroy(); reject(new Error('Payload too large')); return; }
+      chunks.push(chunk);
+    });
+    req.on('end', () => resolve(Buffer.concat(chunks)));
+    req.on('error', reject);
+  });
 }
 
 // ─── HTTP Server ──────────────────────────────────────────────────
@@ -239,16 +293,24 @@ const server = http.createServer(async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.setHeader('Content-Type', 'application/json');
   if (req.method === 'OPTIONS') { res.writeHead(200); res.end(); return; }
 
   const parsedUrl = url.parse(req.url, true);
 
+  // ── GET /validate — single email, optional enrichment via query params ──
   if (req.method === 'GET' && parsedUrl.pathname === '/validate') {
+    res.setHeader('Content-Type', 'application/json');
     const email = parsedUrl.query.email;
     if (!email) { res.writeHead(400); res.end(JSON.stringify({ error: 'Missing email' })); return; }
     try {
-      const result = await validateEmail(email, true);
+      const row = {
+        email,
+        firstName: parsedUrl.query.firstName || '',
+        lastName: parsedUrl.query.lastName || '',
+        company: parsedUrl.query.company || '',
+        website: parsedUrl.query.website || ''
+      };
+      const result = await validateRow(row, true);
       res.writeHead(200); res.end(JSON.stringify(result));
     } catch (err) {
       res.writeHead(500); res.end(JSON.stringify({ error: err.message }));
@@ -256,45 +318,144 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // ── POST /validate-bulk — accepts legacy { emails } or enriched { rows } ──
   if (req.method === 'POST' && parsedUrl.pathname === '/validate-bulk') {
-    let body = '';
-    req.on('data', chunk => body += chunk);
-    req.on('end', async () => {
-      try {
-        const { emails } = JSON.parse(body);
-        if (!Array.isArray(emails) || !emails.length) {
-          res.writeHead(400); res.end(JSON.stringify({ error: 'Send { emails: [...] }' })); return;
-        }
-        const limited = emails.slice(0, 1000);
-        const results = [];
-        // Bulk: skip SMTP to be faster, MX is sufficient for lists
-        for (let i = 0; i < limited.length; i += 10) {
-          const batch = limited.slice(i, i + 10);
-          const batchResults = await Promise.all(batch.map(e => validateEmail(e, false)));
-          results.push(...batchResults);
-        }
-        res.writeHead(200); res.end(JSON.stringify({ results }));
-      } catch (err) {
-        res.writeHead(500); res.end(JSON.stringify({ error: err.message }));
+    res.setHeader('Content-Type', 'application/json');
+    try {
+      const body = await collectBody(req);
+      const parsed = JSON.parse(body.toString('utf8'));
+      const items = Array.isArray(parsed.rows) ? parsed.rows
+                  : Array.isArray(parsed.emails) ? parsed.emails
+                  : null;
+      if (!items || !items.length) {
+        res.writeHead(400); res.end(JSON.stringify({ error: 'Send { emails: [...] } or { rows: [{ email, firstName, lastName, company, website }, ...] }' }));
+        return;
       }
-    });
+      // 500 is the free-tier cap per run (planned: $0.25 per additional 500
+      // once billing exists — not implemented here, this file has no payment
+      // logic). Keep in sync with BULK_LIMIT in index.html.
+      const limited = items.slice(0, 500).map(normalizeRow);
+      const results = [];
+      // Bulk: skip SMTP on the base check to stay fast — MX is sufficient
+      // for lists. Suggestion-building (for invalid rows) still runs full
+      // SMTP on the handful of candidate corrections it generates.
+      for (let i = 0; i < limited.length; i += 10) {
+        const batch = limited.slice(i, i + 10);
+        const batchResults = await Promise.all(batch.map(row => validateRow(row, false)));
+        results.push(...batchResults);
+      }
+      res.writeHead(200); res.end(JSON.stringify({ results }));
+    } catch (err) {
+      res.writeHead(err.message === 'Payload too large' ? 413 : 500);
+      res.end(JSON.stringify({ error: err.message }));
+    }
+    return;
+  }
+
+  // ── POST /upload — CSV or Excel file, returns rows + detected column map ──
+  if (req.method === 'POST' && parsedUrl.pathname === '/upload') {
+    res.setHeader('Content-Type', 'application/json');
+    try {
+      const boundary = parseContentTypeBoundary(req.headers['content-type']);
+      if (!boundary) {
+        res.writeHead(400); res.end(JSON.stringify({ error: 'Expected multipart/form-data with a boundary' }));
+        return;
+      }
+      const body = await collectBody(req, MAX_UPLOAD_BYTES);
+      const parts = parseMultipart(body, boundary);
+      const filePart = parts.find(p => p.filename);
+      if (!filePart) {
+        res.writeHead(400); res.end(JSON.stringify({ error: 'No file found in upload' }));
+        return;
+      }
+
+      const isExcel = /\.xlsx?$/i.test(filePart.filename);
+      let rows;
+      try {
+        rows = isExcel ? parseExcel(filePart.data) : parseCSV(filePart.data.toString('utf8'));
+      } catch {
+        res.writeHead(400); res.end(JSON.stringify({ error: 'Could not parse this file. Make sure it is a valid CSV or Excel file.' }));
+        return;
+      }
+
+      if (!rows.length) {
+        res.writeHead(400); res.end(JSON.stringify({ error: 'File appears empty' }));
+        return;
+      }
+
+      const headers = rows[0];
+      const dataRows = rows.slice(1);
+      const columnMap = detectColumnMap(headers);
+
+      res.writeHead(200);
+      res.end(JSON.stringify({ filename: filePart.filename, headers, columnMap, rows: dataRows }));
+    } catch (err) {
+      res.writeHead(err.message === 'Payload too large' ? 413 : 500);
+      res.end(JSON.stringify({ error: err.message }));
+    }
+    return;
+  }
+
+  // ── POST /scan-image — one or more business-card/contact images, OCR'd
+  // and heuristically parsed into { firstName, lastName, email, company,
+  // website } per image. Always returns one entry per uploaded image, even
+  // on OCR failure (with empty fields) — a bad photo should never break
+  // the rest of the batch.
+  if (req.method === 'POST' && parsedUrl.pathname === '/scan-image') {
+    res.setHeader('Content-Type', 'application/json');
+    try {
+      const boundary = parseContentTypeBoundary(req.headers['content-type']);
+      if (!boundary) {
+        res.writeHead(400); res.end(JSON.stringify({ error: 'Expected multipart/form-data with a boundary' }));
+        return;
+      }
+      const body = await collectBody(req, MAX_UPLOAD_BYTES);
+      const parts = parseMultipart(body, boundary);
+      const imageParts = parts.filter(p => p.filename).slice(0, MAX_IMAGES_PER_SCAN);
+      if (!imageParts.length) {
+        res.writeHead(400); res.end(JSON.stringify({ error: 'No image files found in upload' }));
+        return;
+      }
+
+      // OCR is CPU-bound and the worker is shared/serialized internally, so
+      // run these one at a time rather than firing MAX_IMAGES_PER_SCAN
+      // Tesseract jobs at once.
+      const results = [];
+      for (const part of imageParts) {
+        let rawText = '';
+        try { rawText = await extractTextFromImage(part.data); } catch { rawText = ''; }
+        const fields = parseCardText(rawText);
+        results.push({ filename: part.filename, rawText, ...fields });
+      }
+
+      res.writeHead(200);
+      res.end(JSON.stringify({ results }));
+    } catch (err) {
+      res.writeHead(err.message === 'Payload too large' ? 413 : 500);
+      res.end(JSON.stringify({ error: err.message }));
+    }
     return;
   }
 
   if (parsedUrl.pathname === '/ping') {
-    res.writeHead(200); res.end(JSON.stringify({ status: 'ok', smtp: true, version: '2.0' })); return;
+    res.setHeader('Content-Type', 'application/json');
+    res.writeHead(200); res.end(JSON.stringify({ status: 'ok', smtp: true, version: '2.2', features: ['suggestions', 'upload', 'enrichment', 'scan-image'] })); return;
   }
 
+  res.setHeader('Content-Type', 'application/json');
   res.writeHead(404); res.end(JSON.stringify({ error: 'Not found' }));
 });
 
 server.listen(PORT, '127.0.0.1', () => {
   console.log('\n  ====================================');
-  console.log('   📡 PINGBOX v2 — Server Running');
+  console.log('   📡 PINGBOX v2.2 — Server Running');
   console.log('  ====================================');
   console.log(`  ✅ Listening on http://127.0.0.1:${PORT}`);
   console.log('  ✅ MX verification: ON');
   console.log('  ✅ SMTP handshake: ON');
+  console.log('  ✅ Suggestions (typo / constructed / scraped): ON');
+  console.log('  ✅ Upload endpoint (CSV + Excel): ON');
+  console.log('  ✅ Image scan endpoint (OCR business cards): ON');
   console.log('  ------------------------------------');
   console.log('  Open index.html in your browser.');
   console.log('  Keep this window open while using.');
